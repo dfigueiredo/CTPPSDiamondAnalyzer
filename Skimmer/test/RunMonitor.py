@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 import copy
 
-config.source = "PoolSource" # RAW
-#config.source = "NewEventStreamFileReader" # dat
+PluginSource = "PoolSource" # RAW
+#PluginSource = "NewEventStreamFileReader" # dat
 
 process = cms.Process("SkimmerCTPPS")
 
@@ -13,7 +13,7 @@ process = cms.Process("SkimmerCTPPS")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
 #########################
 #    RAW-DIGI-RECO      #
@@ -54,7 +54,7 @@ process.load('RecoCTPPS.TotemRPLocal.ctppsDiamondLocalTracks_cfi')
 #      Input files      #
 #########################
 from CTPPSDiamondAnalyzer.Skimmer.AutoGenerate_cff import readFiles
-process.source = cms.Source (config.source,fileNames = cms.untracked.vstring(readFiles))
+process.source = cms.Source (PluginSource, fileNames = cms.untracked.vstring(readFiles))
 
 
 ######################
@@ -67,9 +67,12 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     tagDiamondRecHits = cms.InputTag("ctppsDiamondRecHits"),
     tagDiamondLocalTracks = cms.InputTag("ctppsDiamondLocalTracks"),
     tagLocalTrack = cms.InputTag("totemRPLocalTrackFitter"),
-    bx = cms.untracked.vint32(1579), #empty vector: no BX selection
+    bx = cms.untracked.vint32(), #empty vector: no BX selection
     verbosity = cms.untracked.uint32(0),
-    path = cms.untracked.string("Run299065")
+    path = cms.untracked.string("RunOutput"),
+    # If ufirstHisto == ulastHisto or ( ufirstHisto < 0 || ulastHisto < 0); fit maximum peak from 0 to 125 ns.
+    ufirstHisto = cms.double(0), # min X histo, (fit and plot draw). 
+    ulastHisto = cms.double(50) # max X histo, (fit and plot draw).
 )
 
 process.p = cms.Path(

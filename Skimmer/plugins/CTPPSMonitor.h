@@ -92,7 +92,12 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::vector<int> bx_;
     unsigned int verbosity_;
     std::string path_;
+    double ufirstHisto_;
+    double ulastHisto_;
+
     bool valid;
+    double minlimit;
+    double maxlimit;
 
     int bx_cms;
     int lumi_section;
