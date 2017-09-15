@@ -84,6 +84,11 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   lumi_section = iEvent.luminosityBlock();
   orbit = iEvent.orbitNumber();
 
+  double arm0_plane1=0;
+  double arm0_plane3=0;
+  double arm1_plane1=0;
+  double arm1_plane3=0;
+
   for ( const auto& digis : *diamondDigis ) {
     const CTPPSDiamondDetId detId( digis.detId() );
     for ( const auto& digi : digis ) {
@@ -101,41 +106,86 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::cout << "HPTDC Error:" << digi.getHPTDCErrorFlags().getErrorFlag() << std::endl;
       }
 
-      if(detId.channel()==30) continue;
-      if(digi.getLeadingEdge()==0 || digi.getTrailingEdge()==0) continue;
+      // Avoid HPTDC Multiple Hits
       if(digi.getMultipleHit()>0) continue;
 
-      if(bx_.size()>0){
-	for (std::vector<std::string>::size_type i=0; i<bx_.size(); i++){
-	  if(bx_cms!=bx_[i]) continue;
+      // Only clock
+      if ( detId.channel() == CHANNEL_OF_VFAT_CLOCK){
+	if ( digi.getLeadingEdge() != 0 ){
+	  hVector_h_clock_leading.at(detId.arm()).at(detId.plane())->Fill(HPTDC_BIN_WIDTH_NS * digi.getLeadingEdge());
+	  hVector_h_clock_trailing.at(detId.arm()).at(detId.plane())->Fill(HPTDC_BIN_WIDTH_NS * digi.getTrailingEdge());
+	  if(detId.arm()==0 && detId.plane()==1) arm0_plane1 = HPTDC_BIN_WIDTH_NS * digi.getLeadingEdge();
+	  if(detId.arm()==0 && detId.plane()==3) arm0_plane3 = HPTDC_BIN_WIDTH_NS * digi.getLeadingEdge();
+	  if(detId.arm()==1 && detId.plane()==1) arm1_plane1 = HPTDC_BIN_WIDTH_NS * digi.getLeadingEdge();
+	  if(detId.arm()==1 && detId.plane()==3) arm1_plane3 = HPTDC_BIN_WIDTH_NS * digi.getLeadingEdge();
+	}
+	// For all other channels     
+      }else{
+	if(digi.getLeadingEdge()==0 || digi.getTrailingEdge()==0) continue;
+	if(bx_.size()>0){
+	  for (std::vector<std::string>::size_type i=0; i<bx_.size(); i++){
+	    if(bx_cms!=bx_[i]) continue;
+	    hVector_h_ch_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    hVector_h_ch_getLeading.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    hVector_h_ch_getTrailing.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getTrailingEdge()*HPTDC_BIN_WIDTH_NS);
+	    if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
+	      hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
+	      hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    }else{
+	      hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
+	      hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    }
+	  }
+	}else{
 	  hVector_h_ch_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
-	  hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  hVector_h_ch_getLeading.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  hVector_h_ch_getTrailing.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getTrailingEdge()*HPTDC_BIN_WIDTH_NS);
-	  if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getTrailingEdge()>=ufirstHisto_ && digi.getTrailingEdge()<ulastHisto_ && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
+	  if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
 	    hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
+	    hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }else{
 	    hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
+	    hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }
-
-	}
-      }else{
-	hVector_h_ch_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
-	hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
-	hVector_h_ch_getLeading.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
-	hVector_h_ch_getTrailing.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getTrailingEdge()*HPTDC_BIN_WIDTH_NS);
-	if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getTrailingEdge()>=ufirstHisto_ && digi.getTrailingEdge()<ulastHisto_ && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
-	  hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
-	}else{
-	  hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	}
       }
-
     }
   }
 
-}
+  if(verbosity_){
+    std::cout << "\nClock Injected at CH30:" << std::endl;
+    std::cout << "Arm0, Plane1: " << arm0_plane1 << std::endl;
+    std::cout << "Arm0, Plane3: " << arm0_plane3 << std::endl;
+    std::cout << "Arm1, Plane1: " << arm1_plane1 << std::endl;
+    std::cout << "Arm1, Plane3: " << arm1_plane3 << std::endl;
+  }
 
+  if(arm0_plane1 != 0 && arm0_plane3 != 0){
+    hVector_combination1D.at(0)->Fill(arm0_plane1 - arm0_plane3);
+    hVector_combination2D.at(0)->Fill(arm0_plane1 - arm0_plane3, arm0_plane1);
+  }
+  if(arm1_plane1 != 0 && arm1_plane3 != 0){
+    hVector_combination1D.at(1)->Fill(arm1_plane1 - arm1_plane3);
+    hVector_combination2D.at(1)->Fill(arm1_plane1 - arm1_plane3, arm1_plane1);
+  }
+  if(arm0_plane1 != 0 && arm1_plane1 != 0){
+    hVector_combination1D.at(2)->Fill(arm0_plane1 - arm1_plane1);
+    hVector_combination2D.at(2)->Fill(arm0_plane1 - arm1_plane1, arm0_plane1);
+  }
+  if(arm0_plane1 != 0 && arm1_plane3 != 0){
+    hVector_combination1D.at(3)->Fill(arm0_plane1 - arm1_plane3);
+    hVector_combination2D.at(3)->Fill(arm0_plane1 - arm1_plane3, arm0_plane1);
+  }
+  if(arm0_plane3 != 0 && arm1_plane1 != 0){
+    hVector_combination1D.at(4)->Fill(arm0_plane3 - arm1_plane1);
+    hVector_combination2D.at(4)->Fill(arm0_plane3 - arm1_plane1, arm0_plane3);
+  }
+  if(arm0_plane3 != 0 && arm1_plane3 != 0){
+    hVector_combination1D.at(5)->Fill(arm0_plane3 - arm1_plane3);
+    hVector_combination2D.at(5)->Fill(arm0_plane3 - arm1_plane3, arm0_plane3);
+  }
+
+}
 
 // ------------ method called once each job just before starting event loop  ------------
   void 
@@ -146,16 +196,35 @@ CTPPSMonitor::beginJob()
   if(ulastHisto_>125) ufirstHisto_=125;
   if(ufirstHisto_>ulastHisto_) ufirstHisto_=0;
 
-  //now do what ever initialization is needed
-  //usesResource("TFileService");
-  //edm::Service<TFileService> fs;
-
   TH1::AddDirectory(true);
   TH2::AddDirectory(true);
 
   fs = TFile::Open("outputfile.root","RECREATE");
-
   char name[300];
+
+  for(int i=0; i<6; i++){
+    std::string tag;
+    if (i==0) tag="clock_combination_arm0pl1-arm0pl3";
+    if (i==1) tag="clock_combination_arm1pl1-arm1pl3";
+    if (i==2) tag="clock_combination_arm0pl1-arm1pl1";
+    if (i==3) tag="clock_combination_arm0pl1-arm1pl3";
+    if (i==4) tag="clock_combination_arm0pl3-arm1pl1";
+    if (i==5) tag="clock_combination_arm0pl3-arm1pl3";
+    sprintf(name,"%s",tag.c_str());
+    TH2F *histo_combination2D = new TH2F(name,";#Deltat [ns]; [ns]",1000, -20, 20, 1954, 0, 50);
+    hVector_combination2D.push_back(histo_combination2D);
+
+    if (i==0) tag="clock_combination_deltat_arm0pl1-arm0pl3";
+    if (i==1) tag="clock_combination_deltat_arm1pl1-arm1pl3";
+    if (i==2) tag="clock_combination_deltat_arm0pl1-arm1pl1";
+    if (i==3) tag="clock_combination_deltat_arm0pl1-arm1pl3";
+    if (i==4) tag="clock_combination_deltat_arm0pl3-arm1pl1";
+    if (i==5) tag="clock_combination_deltat_arm0pl3-arm1pl3";
+    sprintf(name,"%s",tag.c_str());
+    TH1F *histo_combination1D = new TH1F(name,";#Deltat [ns]; N events",1000, -20, 20);
+    hVector_combination1D.push_back(histo_combination1D);
+  }
+
   for (UInt_t arm_i = 0; arm_i < CTPPS_NUM_OF_ARMS; ++arm_i){
     std::vector< std::vector<TProfile*> > vec_arm_per_ch_mean_getLeading_lumisection;
     std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_lumisection;
@@ -165,6 +234,9 @@ CTPPSMonitor::beginJob()
 
     std::vector<TH1D*> vec_arm_per_pl_result_leading;
     std::vector<TH1D*> vec_arm_per_pl_result_trailing;
+
+    std::vector<TH1D*> vec_arm_clock_leading;
+    std::vector<TH1D*> vec_arm_clock_trailing;
 
     for (UInt_t pl_i = 0; pl_i < CTPPS_DIAMOND_NUM_OF_PLANES; ++pl_i){
       std::vector<TProfile*> vec_ch_mean_getLeading_lumisection;
@@ -181,8 +253,15 @@ CTPPSMonitor::beginJob()
       TH1D *histo_pl_result_trailing = new TH1D(name,"; Channel; Signal Fit, Mean [ns]",16,0,16);
       vec_arm_per_pl_result_trailing.push_back(histo_pl_result_trailing);
 
-      for (UInt_t ch_i = 0; ch_i < CTPPS_DIAMOND_NUM_OF_CHANNELS; ++ch_i){
+      sprintf(name,"clock_leading_arm%i_pl%i", arm_i, pl_i);
+      TH1D *histo_clock_leading = new TH1D(name,";[ns]; N events",1954,0,50);
+      vec_arm_clock_leading.push_back(histo_clock_leading);
 
+      sprintf(name,"clock_trailing_arm%i_pl%i", arm_i, pl_i);
+      TH1D *histo_clock_trailing = new TH1D(name,";[ns]; N events",1954,0,50);
+      vec_arm_clock_trailing.push_back(histo_clock_trailing);
+
+      for (UInt_t ch_i = 0; ch_i < CTPPS_DIAMOND_NUM_OF_CHANNELS; ++ch_i){
 	sprintf(name,"mean_getLeadingVslumisection_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
 	TProfile *histo_ch_mean_getLeading_lumisection = new TProfile(name,";LS; [ns]",100, 0, 1000);
 	vec_ch_mean_getLeading_lumisection.push_back(histo_ch_mean_getLeading_lumisection);
@@ -200,7 +279,7 @@ CTPPSMonitor::beginJob()
 	vec_ch_getTrailing.push_back(histo_ch_getTrailing);
 
 	sprintf(name,"deltat_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
-	TH1D *histo_ch_deltat = new TH1D(name,"; [ns]; N events",500,-30.,30.);
+	TH1D *histo_ch_deltat = new TH1D(name,"; [ns]; N events",500,-20.,20.);
 	vec_ch_deltat.push_back(histo_ch_deltat);
       }
       vec_arm_per_ch_mean_getLeading_lumisection.push_back(vec_ch_mean_getLeading_lumisection);
@@ -214,8 +293,10 @@ CTPPSMonitor::beginJob()
     hVector_h_ch_getLeading.push_back( vec_arm_per_ch_getLeading);
     hVector_h_ch_getTrailing.push_back( vec_arm_per_ch_getTrailing);
     hVector_h_ch_deltat.push_back( vec_arm_per_ch_deltat);
-    hVector_h_pl_result_leading.push_back( vec_arm_per_pl_result_leading );
-    hVector_h_pl_result_trailing.push_back( vec_arm_per_pl_result_trailing );
+    hVector_h_pl_result_leading.push_back(vec_arm_per_pl_result_leading);
+    hVector_h_pl_result_trailing.push_back(vec_arm_per_pl_result_trailing);
+    hVector_h_clock_leading.push_back( vec_arm_clock_leading);
+    hVector_h_clock_trailing.push_back( vec_arm_clock_trailing);
   }
 
 }
@@ -229,6 +310,7 @@ CTPPSMonitor::endJob()
 
   gROOT->SetBatch(kTRUE);
   gSystem->mkdir(path_.c_str());
+  gStyle->SetOptFit();
 
   std::ofstream outstring_leading("fit_results_leading.txt");
   std::ofstream outstring_trailing("fit_results_trailing.txt");
@@ -239,6 +321,7 @@ CTPPSMonitor::endJob()
   gSystem->mkdir((path_+"/TimeOverThreshold").c_str());
   gSystem->mkdir((path_+"/LeadingAndTrailingEdge").c_str());
   gSystem->mkdir((path_+"/Results").c_str());
+  gSystem->mkdir((path_+"/Clock").c_str());
 
   char *path_cmssw = std::getenv("CMSSW_BASE");
 
@@ -249,11 +332,34 @@ CTPPSMonitor::endJob()
   gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/TimeOverThreshold/index.php").c_str());
   gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/LeadingAndTrailingEdge/index.php").c_str());
   gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/Results/index.php").c_str());
+  gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/Clock/index.php").c_str());
 
   TCanvas *c1 = new TCanvas("Calibration","",200,10,600,400);
 
+  for(int i=0;i<6;i++){
+    hVector_combination2D.at(i)->Write();
+    hVector_combination1D.at(i)->Write();
+    if(hVector_combination1D.at(i)->GetEntries()>0){
+      hVector_combination1D.at(i)->SetStats(111111);
+      double max_x = hVector_combination1D.at(i)->GetXaxis()->GetBinCenter(hVector_combination1D.at(i)->GetMaximumBin());
+      hVector_combination1D.at(i)->Fit("gaus","","",max_x-0.05*max_x,max_x+0.05*max_x);
+    } 
+    hVector_combination1D.at(i)->Draw();
+    c1->SaveAs(Form("%s/Clock/%s.png",path_.c_str(),hVector_combination1D.at(i)->GetName()));
+    c1->Modified();
+    c1->Update();
+    hVector_combination2D.at(i)->Draw();
+    c1->SaveAs(Form("%s/Clock/%s.png",path_.c_str(),hVector_combination2D.at(i)->GetName()));
+    c1->Modified();
+    c1->Update();
+  }
+
   for (UInt_t arm_i = 0; arm_i < CTPPS_NUM_OF_ARMS; ++arm_i){
     for (UInt_t pl_i = 0; pl_i < CTPPS_DIAMOND_NUM_OF_PLANES; ++pl_i){
+
+      hVector_h_clock_leading.at(arm_i).at(pl_i)->Write();
+      hVector_h_clock_trailing.at(arm_i).at(pl_i)->Write();
+
       for (UInt_t ch_i = 0; ch_i < CTPPS_DIAMOND_NUM_OF_CHANNELS; ++ch_i){
 	hVector_h_ch_mean_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Write();
@@ -288,11 +394,11 @@ CTPPSMonitor::endJob()
 	  hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->SetStats(111111);
 	  if(ufirstHisto_<0 || ulastHisto_<0 || ufirstHisto_==ulastHisto_){
 	    double max_x = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.05*max_x,max_x+0.05*max_x);
+	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.15*max_x,max_x+0.15*max_x);
 	  }else{
 	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->SetRangeUser(ufirstHisto_, ulastHisto_);
 	    double max_x = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.05*max_x,max_x+0.05*max_x);
+	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.15*max_x,max_x+0.15*max_x);
 	  }
 	  if(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")){
 	    int migrad = getFitStatus((char *)gMinuit->fCstatu.Data());
@@ -372,10 +478,10 @@ CTPPSMonitor::endJob()
 	TH1F *hVector_h_ch_getLeading_lumisection_slice = (TH1F*)gDirectory->Get(Form("%s_1",hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetName()));
 	hVector_h_ch_getLeading_lumisection_slice->SetMarkerStyle(20);
 	hVector_h_ch_getLeading_lumisection_slice->SetMarkerSize(.7);
-	hVector_h_ch_getLeading_lumisection_slice->SetName(Form("MeanVsLumisection_fit_arm_%i_pl_%i_ch_%i", arm_i, pl_i, ch_i));
+	hVector_h_ch_getLeading_lumisection_slice->SetName(Form("MeanVsLumisection_fit_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i));
 	hVector_h_ch_getLeading_lumisection_slice->Write();
 	hVector_h_ch_getLeading_lumisection_slice->Draw();
-	c1->SaveAs(Form("%s/LumiSection/MeanVsLumisection_fit_arm_%i_pl_%i_ch_%i.png", path_.c_str(), arm_i, pl_i, ch_i));
+	c1->SaveAs(Form("%s/LumiSection/MeanVsLumisection_fit_arm%i_pl%i_ch%i.png", path_.c_str(), arm_i, pl_i, ch_i));
 	c1->Modified();
 	c1->Update();
 
@@ -404,10 +510,21 @@ CTPPSMonitor::endJob()
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetMarkerStyle(2);
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->Draw("ESAMEEX0");
       leg->Draw();
-      c1->SaveAs(Form("%s/Results/fit_results_arm%i_pl_%i.png",path_.c_str(), arm_i, pl_i));
+      c1->SaveAs(Form("%s/Results/fit_results_arm%i_pl%i.png",path_.c_str(), arm_i, pl_i));
       c1->Modified();
       c1->Update();
       delete leg;
+
+      hVector_h_clock_leading.at(arm_i).at(pl_i)->Draw();
+      c1->SaveAs(Form("%s/Clock/clock_leading_arm%i_pl%i.png",path_.c_str(), arm_i, pl_i));
+      c1->Modified();
+      c1->Update();
+
+      hVector_h_clock_trailing.at(arm_i).at(pl_i)->Draw();
+      c1->SaveAs(Form("%s/Clock/clock_trailing_arm%i_pl%i.png",path_.c_str(), arm_i, pl_i));
+      c1->Modified();
+      c1->Update();
+
     }
   }
 

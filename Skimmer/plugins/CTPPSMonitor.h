@@ -44,6 +44,7 @@
 #include <TMinuit.h>
 #include <TF1.h>
 #include <TLegend.h>
+#include <TStyle.h>
 
 // Constants
 #define SEC_PER_LUMI_SECTION 23.31
@@ -111,6 +112,10 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
     std::vector<std::vector<TH1D*> >  hVector_h_pl_result_leading;
     std::vector<std::vector<TH1D*> >  hVector_h_pl_result_trailing;
+    std::vector<std::vector<TH1D*> >  hVector_h_clock_leading;
+    std::vector<std::vector<TH1D*> >  hVector_h_clock_trailing;
+    std::vector<TH2F*> hVector_combination2D;
+    std::vector<TH1F*> hVector_combination1D;
 
 };
 
