@@ -106,6 +106,7 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
     std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_getLeading_lumisection;
     std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_lumisection;
+    std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_deltat;
     std::vector<std::vector<std::vector<TH1D*> > > hVector_h_ch_getLeading;
     std::vector<std::vector<std::vector<TH1D*> > > hVector_h_ch_getTrailing;
     std::vector<std::vector<std::vector<TH1D*> > > hVector_h_ch_deltat;

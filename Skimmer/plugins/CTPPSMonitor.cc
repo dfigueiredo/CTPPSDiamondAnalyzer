@@ -129,9 +129,11 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    hVector_h_ch_getLeading.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_getTrailing.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getTrailingEdge()*HPTDC_BIN_WIDTH_NS);
 	    if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
+	      hVector_h_ch_getLeading_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	      hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	      hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    }else{
+	      hVector_h_ch_getLeading_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	      hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	      hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    }
@@ -141,9 +143,11 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  hVector_h_ch_getLeading.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  hVector_h_ch_getTrailing.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(digi.getTrailingEdge()*HPTDC_BIN_WIDTH_NS);
 	  if(ufirstHisto_ >= 0 && ulastHisto_ >=0 && digi.getLeadingEdge()>=ufirstHisto_ && digi.getLeadingEdge()<ulastHisto_){
+	    hVector_h_ch_getLeading_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }else{
+	    hVector_h_ch_getLeading_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }
@@ -228,6 +232,7 @@ CTPPSMonitor::beginJob()
   for (UInt_t arm_i = 0; arm_i < CTPPS_NUM_OF_ARMS; ++arm_i){
     std::vector< std::vector<TProfile*> > vec_arm_per_ch_mean_getLeading_lumisection;
     std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_lumisection;
+    std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_deltat;
     std::vector< std::vector<TH1D*> > vec_arm_per_ch_getLeading;
     std::vector< std::vector<TH1D*> > vec_arm_per_ch_getTrailing;
     std::vector< std::vector<TH1D*> > vec_arm_per_ch_deltat;
@@ -241,6 +246,7 @@ CTPPSMonitor::beginJob()
     for (UInt_t pl_i = 0; pl_i < CTPPS_DIAMOND_NUM_OF_PLANES; ++pl_i){
       std::vector<TProfile*> vec_ch_mean_getLeading_lumisection;
       std::vector<TH2F*> vec_ch_getLeading_lumisection;
+      std::vector<TH2F*> vec_ch_getLeading_deltat;
       std::vector<TH1D*> vec_ch_getLeading;
       std::vector<TH1D*> vec_ch_getTrailing;
       std::vector<TH1D*> vec_ch_deltat;
@@ -270,6 +276,10 @@ CTPPSMonitor::beginJob()
 	TH2F *histo_ch_getLeading_lumisection = new TH2F(name,";LS; [ns]",100, 0, 1000, 1500, 0, 200);
 	vec_ch_getLeading_lumisection.push_back(histo_ch_getLeading_lumisection);
 
+	sprintf(name,"getLeadingVsDeltat_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
+	TH2F *histo_ch_getLeading_deltat = new TH2F(name,";Trailing Edge - Leading Edge [ns]; Leading Edge [ns]",500, -20, 20, 1500, 0, 200);
+	vec_ch_getLeading_deltat.push_back(histo_ch_getLeading_deltat);
+
 	sprintf(name,"getLeading_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
 	TH1D *histo_ch_getLeading = new TH1D(name,";[ns]; N events",1500,0,200);
 	vec_ch_getLeading.push_back(histo_ch_getLeading);
@@ -284,12 +294,14 @@ CTPPSMonitor::beginJob()
       }
       vec_arm_per_ch_mean_getLeading_lumisection.push_back(vec_ch_mean_getLeading_lumisection);
       vec_arm_per_ch_getLeading_lumisection.push_back(vec_ch_getLeading_lumisection);
+      vec_arm_per_ch_getLeading_deltat.push_back(vec_ch_getLeading_deltat);
       vec_arm_per_ch_getLeading.push_back(vec_ch_getLeading);
       vec_arm_per_ch_getTrailing.push_back(vec_ch_getTrailing);
       vec_arm_per_ch_deltat.push_back(vec_ch_deltat);
     }
     hVector_h_ch_mean_getLeading_lumisection.push_back(vec_arm_per_ch_mean_getLeading_lumisection);
     hVector_h_ch_getLeading_lumisection.push_back(vec_arm_per_ch_getLeading_lumisection);
+    hVector_h_ch_getLeading_deltat.push_back( vec_arm_per_ch_getLeading_deltat );
     hVector_h_ch_getLeading.push_back( vec_arm_per_ch_getLeading);
     hVector_h_ch_getTrailing.push_back( vec_arm_per_ch_getTrailing);
     hVector_h_ch_deltat.push_back( vec_arm_per_ch_deltat);
@@ -452,7 +464,12 @@ CTPPSMonitor::endJob()
 	c1->Modified();
 	c1->Update();
 
-	double max_y = hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->GetBinCenter(hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
+	hVector_h_ch_getLeading_deltat.at(arm_i).at(pl_i).at(ch_i)->Draw();
+	c1->SaveAs(Form("%s/TimeOverThreshold/%s.png", path_.c_str(), hVector_h_ch_getLeading_deltat.at(arm_i).at(pl_i).at(ch_i)->GetName()));
+	c1->Modified();
+	c1->Update();
+
+	double max_y = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
 	//int biny_min = hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->FindBin(ufirstHisto_);
 	//int biny_max = hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->FindBin(ulastHisto_);
 
@@ -473,7 +490,7 @@ CTPPSMonitor::endJob()
 	c1->Update();
 
 	TF1 *g1 = new TF1("g1","gaus",ufirstHisto_, ulastHisto_);
-	g1->SetRange(ufirstHisto_, ulastHisto_);
+	g1->SetRange(max_y-0.01*max_y, max_y+0.01*max_y);
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->FitSlicesY(g1, 0, -1, 0,"QNR", 0);
 	TH1F *hVector_h_ch_getLeading_lumisection_slice = (TH1F*)gDirectory->Get(Form("%s_1",hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetName()));
 	hVector_h_ch_getLeading_lumisection_slice->SetMarkerStyle(20);
@@ -482,6 +499,19 @@ CTPPSMonitor::endJob()
 	hVector_h_ch_getLeading_lumisection_slice->Write();
 	hVector_h_ch_getLeading_lumisection_slice->Draw();
 	c1->SaveAs(Form("%s/LumiSection/MeanVsLumisection_fit_arm%i_pl%i_ch%i.png", path_.c_str(), arm_i, pl_i, ch_i));
+	c1->Modified();
+	c1->Update();
+
+	TH1F *projh2Y = new TH1F("projectY", ";Fit Result [ns]; N events", 1000, 0, 150);
+	for (Int_t i=0;i<hVector_h_ch_getLeading_lumisection_slice->GetNbinsX();i++){
+	  if( hVector_h_ch_getLeading_lumisection_slice->GetBinContent(i) > 0) projh2Y->Fill(hVector_h_ch_getLeading_lumisection_slice->GetBinContent(i));
+	}
+
+	projh2Y->SetName(Form("ProjectY_MeanVsLumisection_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i));
+	projh2Y->Write();
+	projh2Y->SetLineColor(kBlue);
+	projh2Y->Draw("histo");
+	c1->SaveAs(Form("%s/LumiSection/ProjectY_MeanVsLumisection_fit_arm%i_pl%i_ch%i.png", path_.c_str(), arm_i, pl_i, ch_i));
 	c1->Modified();
 	c1->Update();
 
