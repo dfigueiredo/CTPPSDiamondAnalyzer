@@ -415,8 +415,8 @@ CTPPSMonitor::endJob()
 	  if(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")){
 	    int migrad = getFitStatus((char *)gMinuit->fCstatu.Data());
 	    if(migrad>1){
-	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1));
-	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinError(ch_i+1,hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1));
+	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,(double)hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1));
+	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinError(ch_i+1,(double)hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1));
 	      outstring_leading << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1) << "\tError: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1) << std::endl;
 	    }	 
 	  }
@@ -435,8 +435,8 @@ CTPPSMonitor::endJob()
 	  if(hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")){
 	    int migrad = getFitStatus((char *)gMinuit->fCstatu.Data())  ;
 	    if(migrad>1){
-	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1));
-	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinError(ch_i+1,hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1));
+	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,(double)hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1));
+	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinError(ch_i+1,(double)hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1));
 	      outstring_trailing << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1) << "\tError: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1) << std::endl;
 	    }
 	  }
@@ -528,17 +528,15 @@ CTPPSMonitor::endJob()
       hVector_h_pl_result_leading.at(arm_i).at(pl_i)->GetYaxis()->SetRangeUser(0.,200.);
       hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetStats(0);
       hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetLineColor(kBlack);
+      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetLineWidth(1.);
       hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetMarkerColor(kBlack);
-      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetMarkerSize(2);
-      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetMarkerStyle(2);
-      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->Draw("E1P");
+      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->Draw("PLC PMC");
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->GetYaxis()->SetRangeUser(0.,200.);
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetStats(0);
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetLineColor(kOrange);
+      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetLineWidth(1.);
       hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetMarkerColor(kOrange);
-      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetMarkerSize(2);
-      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetMarkerStyle(2);
-      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->Draw("ESAMEEX0");
+      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->Draw("SAME PLC PMC");
       leg->Draw();
       c1->SaveAs(Form("%s/Results/fit_results_arm%i_pl%i.png",path_.c_str(), arm_i, pl_i));
       c1->Modified();
