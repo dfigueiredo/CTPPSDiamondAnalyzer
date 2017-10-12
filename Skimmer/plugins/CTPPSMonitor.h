@@ -80,6 +80,8 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   private:
 
     TFile* fs;
+    TFile* fs_tree;
+
     virtual void beginJob() override;
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
@@ -95,14 +97,26 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::string path_;
     double ufirstHisto_;
     double ulastHisto_;
+    unsigned int reducedPlots_;
+    bool createNtuple_;
 
     bool valid;
     double minlimit;
     double maxlimit;
 
+    int run_number;
     int bx_cms;
     int lumi_section;
     int orbit;
+
+    TTree *tree_;
+    int brun_number_;
+    int barm_;
+    int bplane_;
+    int bchannel_;
+    double bmean_;
+    double bsigma_;
+    double bchi2_;
 
     std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_getLeading_lumisection;
     std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_lumisection;

@@ -35,7 +35,9 @@ CTPPSMonitor::CTPPSMonitor(const edm::ParameterSet &iConfig):
   verbosity_        (iConfig.getUntrackedParameter<unsigned int>( "verbosity", 0 ) ),
   path_             (iConfig.getUntrackedParameter<std::string> ( "path" ) ),
   ufirstHisto_       (iConfig.getParameter<double> ( "ufirstHisto" ) ),
-  ulastHisto_       (iConfig.getParameter<double> ( "ulastHisto" ) )
+  ulastHisto_       (iConfig.getParameter<double> ( "ulastHisto" ) ),
+  reducedPlots_        (iConfig.getUntrackedParameter<unsigned int>( "reducedPlots", 0 ) ),
+  createNtuple_        (iConfig.getUntrackedParameter<Bool_t>( "createNtuple", false ) )
 {
 
 }
@@ -80,6 +82,7 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   valid &= diamondDigis.isValid();
   valid &= fedInfo.isValid();
 
+  run_number = iEvent.id().run();
   bx_cms = iEvent.bunchCrossing();
   lumi_section = iEvent.luminosityBlock();
   orbit = iEvent.orbitNumber();
@@ -203,7 +206,8 @@ CTPPSMonitor::beginJob()
   TH1::AddDirectory(true);
   TH2::AddDirectory(true);
 
-  fs = TFile::Open("outputfile.root","RECREATE");
+  TString filename_histo = "outputfile_" + path_ + ".root";
+  fs = TFile::Open(filename_histo,"RECREATE");
   char name[300];
 
   for(int i=0; i<6; i++){
@@ -215,7 +219,7 @@ CTPPSMonitor::beginJob()
     if (i==4) tag="clock_combination_arm0pl3-arm1pl1";
     if (i==5) tag="clock_combination_arm0pl3-arm1pl3";
     sprintf(name,"%s",tag.c_str());
-    TH2F *histo_combination2D = new TH2F(name,";#Deltat [ns]; [ns]",1000, -20, 20, 1954, 0, 50);
+    TH2F *histo_combination2D = new TH2F(name,";#Deltat [ns]; [ns]",1000, -20, 20, 2000, 0, 50);
     hVector_combination2D.push_back(histo_combination2D);
 
     if (i==0) tag="clock_combination_deltat_arm0pl1-arm0pl3";
@@ -260,20 +264,20 @@ CTPPSMonitor::beginJob()
       vec_arm_per_pl_result_trailing.push_back(histo_pl_result_trailing);
 
       sprintf(name,"clock_leading_arm%i_pl%i", arm_i, pl_i);
-      TH1D *histo_clock_leading = new TH1D(name,";[ns]; N events",1954,0,50);
+      TH1D *histo_clock_leading = new TH1D(name,";[ns]; N events",2000,0,50);
       vec_arm_clock_leading.push_back(histo_clock_leading);
 
       sprintf(name,"clock_trailing_arm%i_pl%i", arm_i, pl_i);
-      TH1D *histo_clock_trailing = new TH1D(name,";[ns]; N events",1954,0,50);
+      TH1D *histo_clock_trailing = new TH1D(name,";[ns]; N events",2000,0,50);
       vec_arm_clock_trailing.push_back(histo_clock_trailing);
 
       for (UInt_t ch_i = 0; ch_i < CTPPS_DIAMOND_NUM_OF_CHANNELS; ++ch_i){
 	sprintf(name,"mean_getLeadingVslumisection_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
-	TProfile *histo_ch_mean_getLeading_lumisection = new TProfile(name,";LS; [ns]",100, 0, 1000);
+	TProfile *histo_ch_mean_getLeading_lumisection = new TProfile(name,";LS; [ns]",500, 0, 1000);
 	vec_ch_mean_getLeading_lumisection.push_back(histo_ch_mean_getLeading_lumisection);
 
 	sprintf(name,"getLeadingVslumisection_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
-	TH2F *histo_ch_getLeading_lumisection = new TH2F(name,";LS; [ns]",100, 0, 1000, 1500, 0, 200);
+	TH2F *histo_ch_getLeading_lumisection = new TH2F(name,";LS; [ns]",500, 0, 1000, 1500, 0, 200);
 	vec_ch_getLeading_lumisection.push_back(histo_ch_getLeading_lumisection);
 
 	sprintf(name,"getLeadingVsDeltat_arm%i_pl%i_ch%i", arm_i, pl_i, ch_i);
@@ -311,6 +315,19 @@ CTPPSMonitor::beginJob()
     hVector_h_clock_trailing.push_back( vec_arm_clock_trailing);
   }
 
+  TString filename_ntuple = "ntuple_" + path_ + ".root";
+  fs_tree = TFile::Open(filename_ntuple,"RECREATE");
+  fs_tree->cd();
+  tree_ = new TTree("calibration","Calibration TTree");
+
+  tree_->Branch("run_number", &brun_number_, "run_number/I");
+  tree_->Branch("arm", &barm_, "arm/I");
+  tree_->Branch("plane", &bplane_, "plane/I");
+  tree_->Branch("channel", &bchannel_, "channel/I");
+  tree_->Branch("mean", &bmean_, "mean/D");
+  tree_->Branch("sigma", &bsigma_, "sigma/D");
+  tree_->Branch("chi2", &bchi2_, "chi2/D");
+
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -324,8 +341,10 @@ CTPPSMonitor::endJob()
   gSystem->mkdir(path_.c_str());
   gStyle->SetOptFit();
 
-  std::ofstream outstring_leading("fit_results_leading.txt");
-  std::ofstream outstring_trailing("fit_results_trailing.txt");
+  TString fit_leading = "fit_results_leading_" + path_ + ".txt";
+  TString fit_trailing = "fit_results_trailing_" + path_ + ".txt";
+  std::ofstream outstring_leading(fit_leading);
+  std::ofstream outstring_trailing(fit_trailing);
 
   gSystem->mkdir((path_+"/LumiSection").c_str());
   gSystem->mkdir((path_+"/LeadingEdge").c_str());
@@ -377,7 +396,7 @@ CTPPSMonitor::endJob()
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Write();
-	hVector_h_ch_deltat.at(arm_i).at(pl_i).at(ch_i)->Write();
+	if(reducedPlots_ > 10) hVector_h_ch_deltat.at(arm_i).at(pl_i).at(ch_i)->Write();
 
 	TLegend* leg = new TLegend(0.7597956,0.822335,0.9931857,0.9949239,NULL,"brNDC");
 	leg->SetFillColor(kWhite);
@@ -406,18 +425,28 @@ CTPPSMonitor::endJob()
 	  hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->SetStats(111111);
 	  if(ufirstHisto_<0 || ulastHisto_<0 || ufirstHisto_==ulastHisto_){
 	    double max_x = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.15*max_x,max_x+0.15*max_x);
+	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.25*max_x,max_x+0.25*max_x);
 	  }else{
 	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->SetRangeUser(ufirstHisto_, ulastHisto_);
 	    double max_x = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.15*max_x,max_x+0.15*max_x);
+	    hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Fit("gaus","","",max_x-0.25*max_x,max_x+0.25*max_x);
 	  }
 	  if(hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")){
 	    int migrad = getFitStatus((char *)gMinuit->fCstatu.Data());
 	    if(migrad>1){
 	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,(double)hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1));
 	      hVector_h_pl_result_leading.at(arm_i).at(pl_i)->SetBinError(ch_i+1,(double)hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1));
-	      outstring_leading << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1) << "\tError: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1) << std::endl;
+	      outstring_leading << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1) << "\tError: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1) << "\tChi2: " << hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetChisquare() << std::endl;
+	      brun_number_ = run_number;
+	      barm_ = arm_i;
+	      bplane_ = pl_i;
+	      bchannel_ = ch_i;
+	      bmean_ = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParameter(1);
+	      bsigma_ = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetParError(1);
+	      bchi2_ = hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->GetFunction("gaus")->GetChisquare();
+	      fs_tree->cd();
+	      tree_->Fill();
+	      fs->cd();
 	    }	 
 	  }
 	}
@@ -426,18 +455,18 @@ CTPPSMonitor::endJob()
 	  hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->SetStats(111111);
 	  if(ufirstHisto_<0 || ulastHisto_<0 || ufirstHisto_==ulastHisto_){
 	    double max_x = hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Fit("landau","","",max_x-0.05*max_x,max_x+0.05*max_x);
+	    hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Fit("landau","","",max_x-0.15*max_x,max_x+0.15*max_x);
 	  }else{
 	    hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->SetRangeUser(ufirstHisto_, ulastHisto_);
 	    double max_x = hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetXaxis()->GetBinCenter(hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetMaximumBin());
-	    hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Fit("landau","","",max_x-0.05*max_x,max_x+0.05*max_x);
+	    hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Fit("landau","","",max_x-0.15*max_x,max_x+0.15*max_x);
 	  }
 	  if(hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")){
 	    int migrad = getFitStatus((char *)gMinuit->fCstatu.Data())  ;
 	    if(migrad>1){
 	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinContent(ch_i+1,(double)hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1));
 	      hVector_h_pl_result_trailing.at(arm_i).at(pl_i)->SetBinError(ch_i+1,(double)hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1));
-	      outstring_trailing << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1) << "\tError: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1) << std::endl;
+	      outstring_trailing << "Arm: " << arm_i << "\tPlane: " << pl_i << "\tCh: " << ch_i << "\tMean: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParameter(1) << "\tError: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetParError(1) << "\tChi2: " << hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->GetFunction("landau")->GetChisquare() << std::endl;
 	    }
 	  }
 	}
@@ -473,7 +502,7 @@ CTPPSMonitor::endJob()
 	//int biny_min = hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->FindBin(ufirstHisto_);
 	//int biny_max = hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->FindBin(ulastHisto_);
 
-	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->SetRangeUser(max_y-0.15*max_y,max_y+0.15*max_y);
+	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetYaxis()->SetRangeUser(max_y-0.25*max_y,max_y+0.25*max_y);
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->SetMarkerStyle(20);
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->SetMarkerSize(.7);
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Draw();
@@ -490,7 +519,7 @@ CTPPSMonitor::endJob()
 	c1->Update();
 
 	TF1 *g1 = new TF1("g1","gaus",ufirstHisto_, ulastHisto_);
-	g1->SetRange(max_y-0.01*max_y, max_y+0.01*max_y);
+	g1->SetRange(max_y-0.25*max_y, max_y+0.25*max_y);
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->FitSlicesY(g1, 0, -1, 0,"QNR", 0);
 	TH1F *hVector_h_ch_getLeading_lumisection_slice = (TH1F*)gDirectory->Get(Form("%s_1",hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->GetName()));
 	hVector_h_ch_getLeading_lumisection_slice->SetMarkerStyle(20);
@@ -558,7 +587,9 @@ CTPPSMonitor::endJob()
 
   outstring_leading.close();
   outstring_trailing.close();
+  fs_tree->Write();
   fs->Close();
+  fs_tree->Close();
 
 }
 
