@@ -13,7 +13,7 @@ process = cms.Process("SkimmerCTPPS")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #########################
 #    RAW-DIGI-RECO      #
@@ -56,7 +56,6 @@ process.load('RecoCTPPS.TotemRPLocal.ctppsDiamondLocalTracks_cfi')
 from CTPPSDiamondAnalyzer.Skimmer.AutoGenerate_cff import readFiles
 process.source = cms.Source (PluginSource, fileNames = cms.untracked.vstring(readFiles))
 
-
 ######################
 #      Analyzer      #
 ######################
@@ -69,10 +68,11 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     tagLocalTrack = cms.InputTag("totemRPLocalTrackFitter"),
     bx = cms.untracked.vint32(), #empty vector: no BX selection
     verbosity = cms.untracked.uint32(0),
-    path = cms.untracked.string("RunOutput"),
+    path = cms.untracked.string("RunOutputName"),
     # If ufirstHisto == ulastHisto or ( ufirstHisto < 0 || ulastHisto < 0); fit maximum peak from 0 to 125 ns.
     ufirstHisto = cms.double(0), # min X histo, (fit and plot draw). 
-    ulastHisto = cms.double(50) # max X histo, (fit and plot draw).
+    ulastHisto = cms.double(25), # max X histo, (fit and plot draw).
+    reducedPlots_ = cms.untracked.uint32(0)
 )
 
 process.p = cms.Path(
