@@ -28,6 +28,8 @@
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 // ROOT
 #include <TFile.h>
@@ -86,15 +88,17 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
     virtual int  getFitStatus(char *Migrad);
+    std::string tagType_;
     edm::EDGetTokenT< edm::DetSetVector<TotemVFATStatus> > tokenStatus_;
     edm::EDGetTokenT< edm::DetSetVector<TotemRPLocalTrack> > tokenLocalTrack_;
     edm::EDGetTokenT< edm::DetSetVector<CTPPSDiamondDigi> > tokenDigi_;
     edm::EDGetTokenT< edm::DetSetVector<CTPPSDiamondRecHit> > tokenDiamondHit_;
     edm::EDGetTokenT< edm::DetSetVector<CTPPSDiamondLocalTrack> > tokenDiamondTrack_;
     edm::EDGetTokenT< std::vector<TotemFEDInfo> > tokenFEDInfo_;
+    edm::EDGetTokenT< edm::View<reco::Vertex> > tokenVertexCollection_;
     std::vector<int> bx_;
     unsigned int verbosity_;
-    std::string path_;
+    unsigned int runnumber_;
     double ufirstHisto_;
     double ulastHisto_;
     unsigned int reducedPlots_;
@@ -104,13 +108,13 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     double minlimit;
     double maxlimit;
 
-    int run_number;
+    unsigned int runnumber;
     int bx_cms;
     int lumi_section;
     int orbit;
 
     TTree *tree_;
-    int brun_number_;
+    int brunnumber_;
     int barm_;
     int bplane_;
     int bchannel_;
@@ -118,8 +122,15 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     double bsigma_;
     double bchi2_;
 
+    std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_vertexz_lumisection;
+    std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_vertexz_lumisection;
+
+    std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_nvertex_lumisection;
+    std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_nvertex_lumisection;
+
     std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_getLeading_lumisection;
     std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_lumisection;
+
     std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_deltat;
     std::vector<std::vector<std::vector<TH1D*> > > hVector_h_ch_getLeading;
     std::vector<std::vector<std::vector<TH1D*> > > hVector_h_ch_getTrailing;
@@ -131,6 +142,12 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::vector<std::vector<TH1D*> >  hVector_h_clock_trailing;
     std::vector<TH2F*> hVector_combination2D;
     std::vector<TH1F*> hVector_combination1D;
+
+    TProfile* h_mean_vertexz_lumisection;
+    TProfile* h_mean_nvertex_lumisection;
+
+    TH2* h_vertexz_lumisection;
+    TH2* h_nvertex_lumisection;
 
 };
 
