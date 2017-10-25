@@ -5,7 +5,7 @@ import copy
 ####################
 #    Input File    #
 ####################
-data_type = "RECO"
+data_type = "DAT"
 
 if data_type=="RAW" or data_type == "raw" or data_type=="RECO" or data_type == "reco":
 	PluginSource = "PoolSource"
@@ -21,7 +21,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 	#SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 #########################
 #    RAW-DIGI-RECO      #
@@ -96,7 +96,6 @@ else:
         process.ctppsDiamondRawToDigi *
         process.ctppsDiamondRecHits *
         process.ctppsDiamondLocalTracks *
-        process.goodOfflinePrimaryVertices *
         process.Monitor
     )
 
