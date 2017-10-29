@@ -1,0 +1,20 @@
+readFiles = [
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/1053BC61-2764-E711-82F9-02163E01361D.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/28395434-2364-E711-8C86-02163E0137C1.root',  
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/6E9C597A-2464-E711-BE70-02163E014569.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/BAE42350-2764-E711-A267-02163E01241C.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/1256CF49-2764-E711-A821-02163E011F3F.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/289FAD78-2464-E711-BF08-02163E019B9B.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/7A3DBF46-2764-E711-BCEB-02163E011E6C.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/D8AEDC44-2364-E711-A536-02163E01387A.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/12E20E6D-2964-E711-90BA-02163E019C2D.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/30BC8249-2764-E711-B5E6-02163E01411B.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/7A40556A-2964-E711-ADE3-02163E012A69.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/EC88CB66-2964-E711-B4C8-02163E019BC5.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/18052553-2764-E711-A1B2-02163E0142F0.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/3811891E-2664-E711-8591-02163E01A43F.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/B6D7281F-2364-E711-8536-02163E01411B.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/209127BE-2A64-E711-94FD-02163E0137C1.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/6E89E669-2464-E711-94CC-02163E01A4CE.root',
+'/store/express/Run2017B/ExpressPhysics/FEVT/Express-v1/000/298/596/00000/B83FB766-2964-E711-8D4F-02163E019C08.root'
+]
