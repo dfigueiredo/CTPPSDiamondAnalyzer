@@ -1,8 +1,0 @@
-#Proxy
-voms-proxy-init --voms cms -valid 720:00 --out $PROXYDIR/x509_proxy 
-
-#Submit
-bsub -q 2nd -J job1 < runJob.csh
-
-#Check
-bjobs" or bpeek
