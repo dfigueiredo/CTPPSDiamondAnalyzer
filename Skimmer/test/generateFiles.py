@@ -1,13 +1,16 @@
 import os
 
-#Jonathan's Free Running
+#CTPPS Tests
 #path_ = '/store/group/dpg_ctpps/comm_ctpps/HPTDC_calibration/MinidaqRun302086/'
+#path_ = '/store/group/dpg_ctpps/comm_ctpps/Timing_Commissioning/ClockTestsRuns/303982/'
 
 #Global
-path_ = '/store/t0streamer/Data/PhysicsCommissioning/000/299/325/'
+#path_ = '/store/t0streamer/Data/PhysicsCommissioning/000/303/641/'
+#path_ = '/store/t0streamer/Data/Physics/000/303/942/'
 
 #Minidaq
-#path_ = '/store/t0streamer/Minidaq/A/000/301/186/'
+path_ = '/store/t0streamer/Minidaq/A/000/303/982/'
+
 file_save = open("../python/AutoGenerate_cff.py",'w') 
 
 asps = []

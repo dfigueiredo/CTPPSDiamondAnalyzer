@@ -5,7 +5,7 @@ import copy
 ####################
 #    Input File    #
 ####################
-data_type = "DAT"
+data_type = "dat"
 
 if data_type=="RAW" or data_type == "raw" or data_type=="RECO" or data_type == "reco":
 	PluginSource = "PoolSource"
@@ -82,7 +82,7 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     # If ufirstHisto == ulastHisto or ( ufirstHisto < 0 || ulastHisto < 0); fit maximum peak from 0 to 125 ns.
     ufirstHisto = cms.double(0), # min X histo, (fit and plot draw). 
     ulastHisto = cms.double(25), # max X histo, (fit and plot draw).
-    reducedPlots_ = cms.untracked.uint32(0) # > 0, generates image plots automatically. #If 2, produce extra plots leading/trailing vs ToT per channel.
+    reducedPlots = cms.untracked.uint32(0) # > 0, generates image plots automatically. #If 2, produce extra plots leading/trailing vs ToT per channel.
 )
 
 if data_type == "RECO":
@@ -91,8 +91,6 @@ if data_type == "RECO":
     )
 else:
     process.p = cms.Path(
-        process.ctppsRawToDigi *
-        process.recoCTPPS *
         process.ctppsDiamondRawToDigi *
         process.ctppsDiamondRecHits *
         process.ctppsDiamondLocalTracks *
