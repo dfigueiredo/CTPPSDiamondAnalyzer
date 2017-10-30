@@ -5,7 +5,7 @@ import copy
 ####################
 #    Input File    #
 ####################
-data_type = "dat"
+data_type = "reco"
 
 if data_type=="RAW" or data_type == "raw" or data_type=="RECO" or data_type == "reco":
 	PluginSource = "PoolSource"
@@ -21,7 +21,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 	#SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50000) )
 
 #########################
 #    RAW-DIGI-RECO      #
@@ -85,7 +85,7 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     reducedPlots = cms.untracked.uint32(0) # > 0, generates image plots automatically. #If 2, produce extra plots leading/trailing vs ToT per channel.
 )
 
-if data_type == "RECO":
+if data_type == "RECO" or data_type == "reco":
     process.p = cms.Path(
         process.Monitor
     )
