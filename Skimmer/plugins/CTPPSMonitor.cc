@@ -89,33 +89,22 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   lumi_section = iEvent.luminosityBlock();
   orbit = iEvent.orbitNumber();
 
-  if(tagType_ == "reco" || tagType_ == "RECO"){
-
-    edm::Handle<edm::View<reco::Vertex>> vertexCollectionHandle;
-    iEvent.getByToken(tokenVertexCollection_, vertexCollectionHandle);
-
-    int nVertex = 0;
-    for ( const auto& vtx : *vertexCollectionHandle ) {
-
-      if(runnumber != runnumber_) continue;
-
-      if(vtx.isFake()==1){
-	if(verbosity_) std::cout << "Fake, Vertex: " << vtx.z() << std::endl;
-      }else{
-	h_vertexz_lumisection->Fill(lumi_section, vtx.z());
-	h_mean_vertexz_lumisection->Fill(lumi_section, vtx.z());
-	nVertex++;
-	if(verbosity_) std::cout << "Vertex: " << vtx.z() << std::endl;
-      }
-    }
-    h_nvertex_lumisection->Fill(lumi_section, nVertex);
-    h_mean_nvertex_lumisection->Fill(lumi_section, nVertex);
-  }
-
   double arm0_plane1=0;
   double arm0_plane3=0;
   double arm1_plane1=0;
   double arm1_plane3=0;
+
+  std::vector<double> vec_leading;
+  vec_leading.clear();
+
+  std::vector<double> vec_leading_arm0;
+  vec_leading_arm0.clear();
+
+  std::vector<double> vec_leading_arm1;
+  vec_leading_arm1.clear();
+
+  std::vector<double> vec_vertexz;
+  vec_vertexz.clear();
 
   for ( const auto& digis : *diamondDigis ) {
 
@@ -168,6 +157,23 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	      hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	    }
+
+	    if(tagType_ == "reco" || tagType_ == "RECO"){
+	      edm::Handle<edm::View<reco::Vertex>> vertexCollectionHandle;
+	      iEvent.getByToken(tokenVertexCollection_, vertexCollectionHandle);
+	      for ( const auto& vtx : *vertexCollectionHandle ) {
+		if(vtx.isFake()==1){
+		  if(verbosity_) std::cout << "Fake, Vertex: " << vtx.z() << std::endl;
+		}else{
+		  hVector_h_ch_getLeading_vertexz.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(vtx.z(),digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+		  hVector_h_ch_mean_getLeading_vertexz.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(vtx.z(),digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+		}
+	      }
+
+	    }
+	    vec_leading.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    if(detId.arm()==0) vec_leading_arm0.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	    if(detId.arm()==1) vec_leading_arm1.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }
 	}else{
 	  hVector_h_ch_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
@@ -182,9 +188,66 @@ CTPPSMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    hVector_h_ch_deltat.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill((digi.getTrailingEdge()-digi.getLeadingEdge())*HPTDC_BIN_WIDTH_NS);
 	    hVector_h_ch_mean_getLeading_lumisection.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(lumi_section, digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	  }
+
+	  if(tagType_ == "reco" || tagType_ == "RECO"){
+	    edm::Handle<edm::View<reco::Vertex>> vertexCollectionHandle;
+	    iEvent.getByToken(tokenVertexCollection_, vertexCollectionHandle);
+	    for ( const auto& vtx : *vertexCollectionHandle ) {
+	      if(vtx.isFake()==1){
+		if(verbosity_) std::cout << "Fake, Vertex: " << vtx.z() << std::endl;
+	      }else{
+		hVector_h_ch_getLeading_vertexz.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(vtx.z(),digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+		hVector_h_ch_mean_getLeading_vertexz.at(detId.arm()).at(detId.plane()).at(detId.channel())->Fill(vtx.z(),digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	      }
+	    }
+
+	  }
+	  vec_leading.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	  if(detId.arm()==0) vec_leading_arm0.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
+	  if(detId.arm()==1) vec_leading_arm1.push_back(digi.getLeadingEdge()*HPTDC_BIN_WIDTH_NS);
 	}
       }
     }
+  } // end digi loop
+
+  if(tagType_ == "reco" || tagType_ == "RECO"){
+
+    edm::Handle<edm::View<reco::Vertex>> vertexCollectionHandle;
+    iEvent.getByToken(tokenVertexCollection_, vertexCollectionHandle);
+
+    int nVertex = 0;
+    for ( const auto& vtx : *vertexCollectionHandle ) {
+
+      if(runnumber != runnumber_) continue;
+      if(vtx.isFake()==1){
+	if(verbosity_) std::cout << "Fake, Vertex: " << vtx.z() << std::endl;
+      }else{
+	h_vertexz_lumisection->Fill(lumi_section, vtx.z());
+	h_mean_vertexz_lumisection->Fill(lumi_section, vtx.z());
+	nVertex++;
+	vec_vertexz.push_back(vtx.z());
+	if(verbosity_) std::cout << "Vertex: " << vtx.z() << std::endl;
+
+	for(size_t i=0; i< vec_leading.size(); i++){
+	  h_leading_vertexz->Fill(vtx.z(),vec_leading[i]);
+	  h_mean_leading_vertexz->Fill(vtx.z(),vec_leading[i]);
+	}
+
+      }
+    }
+
+    h_nvertex_lumisection->Fill(lumi_section, nVertex);
+    h_mean_nvertex_lumisection->Fill(lumi_section, nVertex);
+    h_NVertex_NArm0->Fill(vec_vertexz.size(), vec_leading_arm0.size());
+    h_NVertex_NArm1->Fill(vec_vertexz.size(), vec_leading_arm1.size());
+    h_NArm0_NArm1->Fill(vec_leading_arm0.size(), vec_leading_arm1.size());
+    h_mean_NArm0_lumisection->Fill(lumi_section, vec_leading_arm0.size());
+    h_mean_NArm1_lumisection->Fill(lumi_section, vec_leading_arm1.size());
+
+    for(size_t i=0; i< vec_leading.size(); i++){
+      h_mean_leading_nvertex->Fill(nVertex,vec_leading[i]);
+    }
+
   }
 
   if(verbosity_){
@@ -238,11 +301,21 @@ CTPPSMonitor::beginJob()
   fs = TFile::Open(filename_histo,"RECREATE");
   char name[300];
 
-  h_vertexz_lumisection = new TH2F("vertexz",";LS; Vertex Z[cm]",500, 0, 1000, 500, -40, 40);
-  h_nvertex_lumisection = new TH2F("vertexn",";LS; Vertex Multiplicity",500, 0, 1000, 500, 0, 500);
+  h_vertexz_lumisection = new TH2F("vertexz",";LS; Vertex Z [cm]",500, 0, 1000, 500, -40, 40);
+  h_nvertex_lumisection = new TH2F("vertexn",";LS; Vertex Multiplicity",500, 0, 1000, 100, 0, 100);
+  h_leading_vertexz = new TH2F("LeadingVsVertexz",";Vertex Z [cm]; Leading Edge [ns]",500, -40, 40, 1500, 0, 200);
 
-  h_mean_vertexz_lumisection = new TProfile("mean_vertexz",";LS; Vertex Mean Z [cm]",500, 0, 1000);
-  h_mean_nvertex_lumisection = new TProfile("mean_vertexn",";LS; Vertex Mean Multiplicity",500, 0, 1000);
+  h_mean_vertexz_lumisection = new TProfile("meanVertexz",";LS; Vertex Mean Z [cm]",500, 0, 1000);
+  h_mean_nvertex_lumisection = new TProfile("meanVertexn",";LS; Vertex Mean Multiplicity",500, 0, 1000);
+  h_mean_leading_vertexz = new TProfile("meanLeadingVsVertexz",";Vertex Z [cm]; Leading Edge [ns]",50, -25, 25);
+  h_mean_leading_nvertex = new TProfile("meanLeadingVsNVertex",";Vertex Multiplicity; Leading Edge [ns]",100, 0, 100);
+
+  h_NVertex_NArm0 = new TH2F("NVertex_NArm0",";Vertex Multiplicity; Arm0 Multiplicity", 50, 0, 50, 50, 0, 50);
+  h_NVertex_NArm1 = new TH2F("NVertex_NArm1",";Vertex Multiplicity; Arm1 Multiplicity", 50, 0, 50, 50, 0, 50);
+  h_NArm0_NArm1 = new TH2F("NArm0_NArm1",";Arm0 Multiplicity; Arm1 Multiplicity", 50, 0, 50, 50, 0, 50);
+
+  h_mean_NArm0_lumisection = new TProfile("meanVertexn",";LS; Arm0 Multiplicity", 500, 0, 1000);
+  h_mean_NArm1_lumisection = new TProfile("meanVertexn",";LS; Arm1 Multiplicity", 500, 0, 1000);
 
   for(int i=0; i<6; i++){
     std::string tag;
@@ -272,6 +345,9 @@ CTPPSMonitor::beginJob()
     std::vector< std::vector<TProfile*> > vec_arm_per_ch_mean_getLeading_lumisection;
     std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_lumisection;
 
+    std::vector< std::vector<TProfile*> > vec_arm_per_ch_mean_getLeading_vertexz;
+    std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_vertexz;
+
     std::vector< std::vector<TH2F*> > vec_arm_per_ch_getLeading_deltat;
     std::vector< std::vector<TH1D*> > vec_arm_per_ch_getLeading;
     std::vector< std::vector<TH1D*> > vec_arm_per_ch_getTrailing;
@@ -287,6 +363,9 @@ CTPPSMonitor::beginJob()
 
       std::vector<TProfile*> vec_ch_mean_getLeading_lumisection;
       std::vector<TH2F*> vec_ch_getLeading_lumisection;
+
+      std::vector<TProfile*> vec_ch_mean_getLeading_vertexz;
+      std::vector<TH2F*> vec_ch_getLeading_vertexz;
 
       std::vector<TH2F*> vec_ch_getLeading_deltat;
       std::vector<TH1D*> vec_ch_getLeading;
@@ -319,6 +398,14 @@ CTPPSMonitor::beginJob()
 	TH2F *histo_ch_getLeading_lumisection = new TH2F(name,";LS; [ns]",500, 0, 1000, 1500, 0, 200);
 	vec_ch_getLeading_lumisection.push_back(histo_ch_getLeading_lumisection);
 
+	sprintf(name,"getLeadingVsVertexZArm%iPl%iCh%i", arm_i, pl_i, ch_i);
+	TH2F *histo_ch_getLeading_vertexz = new TH2F(name,";Vertex Z [cm]; Leading Edge [ns]",500, -20, 20, 1500, 0, 200);
+	vec_ch_getLeading_vertexz.push_back(histo_ch_getLeading_vertexz);
+
+	sprintf(name,"meanGetLeadingVsVertexZArm%iPl%iCh%i", arm_i, pl_i, ch_i);
+	TProfile *histo_ch_mean_getLeading_vertexz = new TProfile(name,";Vertex Z [cm]; Leading Edge [ns]",500, -20, 20);
+	vec_ch_mean_getLeading_vertexz.push_back(histo_ch_mean_getLeading_vertexz);
+
 	sprintf(name,"getLeadingVsDeltatArm%iPl%iCh%i", arm_i, pl_i, ch_i);
 	TH2F *histo_ch_getLeading_deltat = new TH2F(name,";Trailing Edge - Leading Edge [ns]; Leading Edge [ns]",500, -20, 20, 1500, 0, 200);
 	vec_ch_getLeading_deltat.push_back(histo_ch_getLeading_deltat);
@@ -338,6 +425,9 @@ CTPPSMonitor::beginJob()
       vec_arm_per_ch_mean_getLeading_lumisection.push_back(vec_ch_mean_getLeading_lumisection);
       vec_arm_per_ch_getLeading_lumisection.push_back(vec_ch_getLeading_lumisection);
 
+      vec_arm_per_ch_getLeading_vertexz.push_back(vec_ch_getLeading_vertexz);
+      vec_arm_per_ch_mean_getLeading_vertexz.push_back(vec_ch_mean_getLeading_vertexz);
+
       vec_arm_per_ch_getLeading_deltat.push_back(vec_ch_getLeading_deltat);
       vec_arm_per_ch_getLeading.push_back(vec_ch_getLeading);
       vec_arm_per_ch_getTrailing.push_back(vec_ch_getTrailing);
@@ -355,6 +445,9 @@ CTPPSMonitor::beginJob()
     hVector_h_pl_result_trailing.push_back(vec_arm_per_pl_result_trailing);
     hVector_h_clock_leading.push_back( vec_arm_clock_leading);
     hVector_h_clock_trailing.push_back( vec_arm_clock_trailing);
+
+    hVector_h_ch_getLeading_vertexz.push_back(vec_arm_per_ch_getLeading_vertexz);
+    hVector_h_ch_mean_getLeading_vertexz.push_back(vec_arm_per_ch_mean_getLeading_vertexz);
   }
 
   if(reducedPlots_>0){
@@ -405,6 +498,7 @@ CTPPSMonitor::endJob()
     gSystem->mkdir((path_+"/LeadingAndTrailingEdge").c_str());
     gSystem->mkdir((path_+"/Results").c_str());
     gSystem->mkdir((path_+"/Clock").c_str());
+    gSystem->mkdir((path_+"/VertexZVsLeadingEdge").c_str());
 
     char *path_cmssw = std::getenv("CMSSW_BASE");
 
@@ -416,6 +510,7 @@ CTPPSMonitor::endJob()
     gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/LeadingAndTrailingEdge/index.php").c_str());
     gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/Results/index.php").c_str());
     gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/Clock/index.php").c_str());
+    gSystem->CopyFile((std::string(path_cmssw)+"/src/CTPPSDiamondAnalyzer/Skimmer/doc/index.php").c_str(),(path_+"/VertexZVsLeadingEdge/index.php").c_str());
 
   }
 
@@ -423,6 +518,16 @@ CTPPSMonitor::endJob()
   h_nvertex_lumisection->Write();
   h_mean_vertexz_lumisection->Write();
   h_mean_nvertex_lumisection->Write();
+  h_leading_vertexz->Write();
+  h_mean_leading_vertexz->Write();
+  h_mean_leading_nvertex->Write();
+
+  h_NVertex_NArm0->Write();
+  h_NVertex_NArm1->Write();
+  h_NArm0_NArm1->Write();
+
+  h_mean_NArm0_lumisection->Write();
+  h_mean_NArm1_lumisection->Write();
 
   for(int i=0;i<6;i++){
     hVector_combination2D.at(i)->Write();
@@ -455,10 +560,14 @@ CTPPSMonitor::endJob()
       hVector_h_clock_trailing.at(arm_i).at(pl_i)->Write();
 
       for (UInt_t ch_i = 0; ch_i < CTPPS_DIAMOND_NUM_OF_CHANNELS; ++ch_i){
+
 	hVector_h_ch_mean_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Write();
+	hVector_h_ch_mean_getLeading_vertexz.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getLeading_lumisection.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getLeading.at(arm_i).at(pl_i).at(ch_i)->Write();
 	hVector_h_ch_getTrailing.at(arm_i).at(pl_i).at(ch_i)->Write();
+	hVector_h_ch_getLeading_vertexz.at(arm_i).at(pl_i).at(ch_i)->Write();
+
 	if(reducedPlots_ == 2) hVector_h_ch_deltat.at(arm_i).at(pl_i).at(ch_i)->Write();
 
 	if(reducedPlots_ > 0){
@@ -561,6 +670,11 @@ CTPPSMonitor::endJob()
 
 	  hVector_h_ch_getLeading_deltat.at(arm_i).at(pl_i).at(ch_i)->Draw();
 	  c1->SaveAs(Form("%s/TimeOverThreshold/%s.png", path_.c_str(), hVector_h_ch_getLeading_deltat.at(arm_i).at(pl_i).at(ch_i)->GetName()));
+	  c1->Modified();
+	  c1->Update();
+
+	  hVector_h_ch_getLeading_vertexz.at(arm_i).at(pl_i).at(ch_i)->Draw();
+	  c1->SaveAs(Form("%s/VertexZVsLeadingEdge/%s.png", path_.c_str(), hVector_h_ch_getLeading_vertexz.at(arm_i).at(pl_i).at(ch_i)->GetName()));
 	  c1->Modified();
 	  c1->Update();
 

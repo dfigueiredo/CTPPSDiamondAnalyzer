@@ -1,16 +1,31 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
-import copy
+import os,sys, atexit, copy
+
+from FWCore.ParameterSet.VarParsing import VarParsing
+options = VarParsing ('analysis')
+options.register('Run', 1, VarParsing.multiplicity.singleton, VarParsing.varType.int,"Run Number.")
+options.register('Type','Reco', VarParsing.multiplicity.singleton, VarParsing.varType.string,"RECO, RAW or DAT format file.")
+options.parseArguments()
+
+print options.Type
+print options.Run
 
 ####################
 #    Input File    #
 ####################
-data_type = "reco"
+data_type = options.Type
 
 if data_type=="RAW" or data_type == "raw" or data_type=="RECO" or data_type == "reco":
 	PluginSource = "PoolSource"
-if data_type =="DAT" or data_type == "dat":
+elif data_type =="DAT" or data_type == "dat":
 	PluginSource = "NewEventStreamFileReader"
+else:
+  print("")
+  print("") 
+  raise RuntimeError, "Unknown option. EXIT! YOU NEED TO SETUP WITH ONE OF THE CORRECT OPTIONS."
+  print("")
+
 
 process = cms.Process("SkimmerCTPPS")
 
@@ -21,7 +36,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 	#SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 #########################
 #    RAW-DIGI-RECO      #
@@ -78,7 +93,7 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     tagVertexCollection = cms.InputTag("offlinePrimaryVertices"),
     bx = cms.untracked.vint32(), #empty vector: no BX selection
     verbosity = cms.untracked.uint32(0),
-    RunNumber = cms.untracked.uint32(304447),
+    RunNumber = cms.untracked.uint32(options.Run),
     # If ufirstHisto == ulastHisto or ( ufirstHisto < 0 || ulastHisto < 0); fit maximum peak from 0 to 125 ns.
     ufirstHisto = cms.double(0), # min X histo, (fit and plot draw). 
     ulastHisto = cms.double(25), # max X histo, (fit and plot draw).

@@ -123,6 +123,7 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     double bchi2_;
 
     std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_vertexz_lumisection;
+    std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_getLeading_vertexz;
     std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_vertexz_lumisection;
 
     std::vector<std::vector<std::vector<TProfile*> > > hVector_h_ch_mean_nvertex_lumisection;
@@ -140,14 +141,31 @@ class CTPPSMonitor : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::vector<std::vector<TH1D*> >  hVector_h_pl_result_trailing;
     std::vector<std::vector<TH1D*> >  hVector_h_clock_leading;
     std::vector<std::vector<TH1D*> >  hVector_h_clock_trailing;
+
     std::vector<TH2F*> hVector_combination2D;
     std::vector<TH1F*> hVector_combination1D;
 
+    std::vector<std::vector<std::vector<TH2F*> > > hVector_h_ch_getLeading_vertexz;
+
+    TProfile* h_mean_leading_nvertex;
+
     TProfile* h_mean_vertexz_lumisection;
     TProfile* h_mean_nvertex_lumisection;
+    TProfile* h_mean_leading_lumisection;
+    TProfile* h_mean_leading_vertexz;
 
     TH2* h_vertexz_lumisection;
     TH2* h_nvertex_lumisection;
+
+    TH2* h_leading_vertexz;
+    TH2* h_leading_nvertex;
+
+    TH2F* h_NVertex_NArm0;
+    TH2F* h_NVertex_NArm1;
+    TH2F* h_NArm0_NArm1;
+
+    TProfile* h_mean_NArm0_lumisection;
+    TProfile* h_mean_NArm1_lumisection;
 
 };
 
