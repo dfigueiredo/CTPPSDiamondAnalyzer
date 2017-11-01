@@ -87,7 +87,7 @@ voms-proxy-init --voms cms
 Execute CMSSW:
 
 ```
-cmsRun CTPPSDiamondAnalyzer/Skimmer/test/RunMonitor.py
+cmsRun CTPPSDiamondAnalyzer/Skimmer/test/RunMonitor.py Run=304447 Type=RECO (Options, Type=RECO,RAW or DAT)
 ```
 
 However, if you would like to submit in lxbatch jobs, configure runJobs.csh and edit for your case. After, do:
@@ -96,9 +96,14 @@ However, if you would like to submit in lxbatch jobs, configure runJobs.csh and 
 ./sendJob.sh (outputs will be saved on $CMSSW_BASE/src/CTPPSDiamondAnalyzer/Skimmer/test)
 ```
 
+<b>Grid Submission</b>
+
 In order to run on grid, reducedPlots option must be set 0. Please, edit crab script accordinly.
+Or, you can use multicrab tool.
 
-
+'''
+/multiCRAB.py
+'''
 
 <b>Copy the Plots to your Private DNS folder in lxplus:</b>
 
