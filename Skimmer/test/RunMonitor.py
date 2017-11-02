@@ -5,11 +5,12 @@ import os,sys, atexit, copy
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('analysis')
 options.register('Run', 1, VarParsing.multiplicity.singleton, VarParsing.varType.int,"Run Number.")
-options.register('Type','Reco', VarParsing.multiplicity.singleton, VarParsing.varType.string,"RECO, RAW or DAT format file.")
+options.register('Type','RECO', VarParsing.multiplicity.singleton, VarParsing.varType.string,"RECO, RAW or DAT format file.")
 options.parseArguments()
 
-print options.Type
-print options.Run
+print ("Options Enabled:")
+print ("Type: %s" % options.Type)
+print ("Run: %s" % options.Run)
 
 ####################
 #    Input File    #
@@ -36,7 +37,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.options   = cms.untracked.PSet(
 	#SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50000) )
 
 #########################
 #    RAW-DIGI-RECO      #
