@@ -314,8 +314,8 @@ CTPPSMonitor::beginJob()
   h_NVertex_NArm1 = new TH2F("NVertex_NArm1",";Vertex Multiplicity; Arm1 Multiplicity", 50, 0, 50, 50, 0, 50);
   h_NArm0_NArm1 = new TH2F("NArm0_NArm1",";Arm0 Multiplicity; Arm1 Multiplicity", 50, 0, 50, 50, 0, 50);
 
-  h_mean_NArm0_lumisection = new TProfile("meanVertexn",";LS; Arm0 Multiplicity", 500, 0, 1000);
-  h_mean_NArm1_lumisection = new TProfile("meanVertexn",";LS; Arm1 Multiplicity", 500, 0, 1000);
+  h_mean_NArm0_lumisection = new TProfile("meanNArm0Vslumisection",";LS; Arm0 Multiplicity", 500, 0, 1000);
+  h_mean_NArm1_lumisection = new TProfile("meanNArm1Vslumisection",";LS; Arm1 Multiplicity", 500, 0, 1000);
 
   for(int i=0; i<6; i++){
     std::string tag;
