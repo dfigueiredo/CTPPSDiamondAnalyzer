@@ -101,9 +101,9 @@ However, if you would like to submit in lxbatch jobs, configure runJobs.csh and 
 In order to run on grid, reducedPlots option must be set 0. Please, edit crab script accordinly.
 Or, you can use multicrab tool.
 
-'''
+```
 /multiCRAB.py
-'''
+```
 
 <b>Copy the Plots to your Private DNS folder in lxplus:</b>
 
