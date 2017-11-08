@@ -113,7 +113,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
 
     if(h0_arm0->GetMaximum()>h0_arm1->GetMaximum()){ ymax0 = h0_arm0->GetMaximum()+0.05*h0_arm0->GetMaximum();}
     else{
-      ymax0 = h0_arm1->GetMaximum()+0.1*h0_arm1->GetMaximum();
+      ymax0 = h0_arm1->GetMaximum()+0.05*h0_arm1->GetMaximum();
     }
 
     if(h1_arm0->GetMinimum()<h1_arm1->GetMinimum()){ ymin1 = h1_arm0->GetMinimum()-0.05*h1_arm0->GetMinimum();}
