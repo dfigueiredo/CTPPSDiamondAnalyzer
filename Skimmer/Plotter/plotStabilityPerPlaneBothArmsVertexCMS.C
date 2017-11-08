@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// How to Run
+// root -l 'plotStabilityPerPlaneBothArmsVertexCMS.C("filename.root")'
+
 void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
 
   gStyle->SetOptStat(0);
