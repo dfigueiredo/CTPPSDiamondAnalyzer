@@ -287,7 +287,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     canvas_per_arm->cd(2);
     pad1_h1->Draw();
     pad1_h1->cd();
-    h1_arm0->SetTitle(title0.c_str());
+    h1_arm0->SetTitle(title1.c_str());
     h1_arm0->Draw("E1 X0 P");
     h1_arm1->Draw("E1 X0 P SAME");
     pad2_h1->Range(xmin-0.1*dx,ymin-0.1*dy,xmax+0.1*dx,ymax+0.1*dy);
@@ -302,7 +302,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     canvas_per_arm->cd(3);
     pad1_h2->Draw();
     pad1_h2->cd();
-    h2_arm0->SetTitle(title0.c_str());
+    h2_arm0->SetTitle(title2.c_str());
     h2_arm0->Draw("E1 X0 P");
     h2_arm1->Draw("E1 X0 P SAME");
     pad2_h2->Range(xmin-0.1*dx,ymin-0.1*dy,xmax+0.1*dx,ymax+0.1*dy);
@@ -317,7 +317,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     canvas_per_arm->cd(4);
     pad1_h3->Draw();
     pad1_h3->cd();
-    h3_arm0->SetTitle(title0.c_str());
+    h3_arm0->SetTitle(title3.c_str());
     h3_arm0->Draw("E1 X0 P");
     h3_arm1->Draw("E1 X0 P SAME");
     pad2_h3->Range(xmin-0.1*dx,ymin-0.1*dy,xmax+0.1*dx,ymax+0.1*dy);
