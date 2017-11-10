@@ -6,11 +6,15 @@ from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing ('analysis')
 options.register('Run', 1, VarParsing.multiplicity.singleton, VarParsing.varType.int,"Run Number.")
 options.register('Type','RECO', VarParsing.multiplicity.singleton, VarParsing.varType.string,"RECO, RAW or DAT format file.")
+options.register('uFirst', 0., VarParsing.multiplicity.singleton, VarParsing.varType.float,"Time window minimum value [ns].")
+options.register('uLast', 25., VarParsing.multiplicity.singleton, VarParsing.varType.float,"Time window maximum value [ns].")
 options.parseArguments()
 
 print ("Options Enabled:")
 print ("Type: %s" % options.Type)
 print ("Run: %s" % options.Run)
+print ("uFirst: %s [ns]" % options.uFirst)
+print ("uLast: %s [ns]" % options.uLast)
 
 ####################
 #    Input File    #
@@ -96,8 +100,8 @@ process.Monitor = cms.EDAnalyzer("CTPPSMonitor",
     verbosity = cms.untracked.uint32(0),
     RunNumber = cms.untracked.uint32(options.Run),
     # If ufirstHisto == ulastHisto or ( ufirstHisto < 0 || ulastHisto < 0); fit maximum peak from 0 to 125 ns.
-    ufirstHisto = cms.double(0), # min X histo, (fit and plot draw). 
-    ulastHisto = cms.double(25), # max X histo, (fit and plot draw).
+    ufirstHisto = cms.double(options.uFirst), # min X histo, (fit and plot draw). 
+    ulastHisto = cms.double(options.uLast), # max X histo, (fit and plot draw).
     reducedPlots = cms.untracked.uint32(0) # > 0, generates image plots automatically. #If 2, produce extra plots leading/trailing vs ToT per channel.
 )
 
