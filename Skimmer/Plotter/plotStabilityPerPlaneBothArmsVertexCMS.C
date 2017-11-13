@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <string.h>
+#include <TFile.h>
 
 // How to Run
 // root -l 'plotStabilityPerPlaneBothArmsVertexCMS.C("filename.root")'
 
-void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
+void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
 
   gStyle->SetOptStat(0);
 
-  TFile *f = new TFile(filename);
+  TFile *f = new TFile(filename.c_str());
   TIter next(f->GetListOfKeys());
   TKey *key;
 
@@ -16,6 +17,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
   Double_t h = 800;
 
   int bin = 20;
+  std::string pic_format="png";
 
   double xmin0, xmin1, xmin2, xmin3;
   double xmax0, xmax1, xmax2, xmax3;
@@ -106,9 +108,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     h2_arm1->Rebin(bin);
     h3_arm1->Rebin(bin);
 
-    if(h0_arm0->GetMinimum()<h0_arm1->GetMinimum()){ ymin0 = h0_arm0->GetMinimum()-0.05*h0_arm0->GetMinimum();}
+    if(h0_arm0->GetMinimum(1)<h0_arm1->GetMinimum(1)){ ymin0 = h0_arm0->GetMinimum(1)-0.05*h0_arm0->GetMinimum(1);}
     else{
-      ymin0 = h0_arm1->GetMinimum()-0.05*h0_arm1->GetMinimum();
+      ymin0 = h0_arm1->GetMinimum(1)-0.05*h0_arm1->GetMinimum(1);
     }
 
     if(h0_arm0->GetMaximum()>h0_arm1->GetMaximum()){ ymax0 = h0_arm0->GetMaximum()+0.05*h0_arm0->GetMaximum();}
@@ -116,9 +118,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
       ymax0 = h0_arm1->GetMaximum()+0.05*h0_arm1->GetMaximum();
     }
 
-    if(h1_arm0->GetMinimum()<h1_arm1->GetMinimum()){ ymin1 = h1_arm0->GetMinimum()-0.05*h1_arm0->GetMinimum();}
+    if(h1_arm0->GetMinimum(1)<h1_arm1->GetMinimum(1)){ ymin1 = h1_arm0->GetMinimum(1)-0.05*h1_arm0->GetMinimum(1);}
     else{
-      ymin1 = h1_arm1->GetMinimum()-0.05*h1_arm1->GetMinimum();
+      ymin1 = h1_arm1->GetMinimum(1)-0.05*h1_arm1->GetMinimum();
     }
 
     if(h1_arm0->GetMaximum()>h1_arm1->GetMaximum()){ ymax1 = h1_arm0->GetMaximum()+0.05*h1_arm0->GetMaximum();}
@@ -126,9 +128,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
       ymax1 = h1_arm1->GetMaximum()+0.05*h1_arm1->GetMaximum();
     }
 
-    if(h2_arm0->GetMinimum()<h2_arm1->GetMinimum()){ ymin2 = h2_arm0->GetMinimum()-0.05*h2_arm0->GetMinimum();}
+    if(h2_arm0->GetMinimum(1)<h2_arm1->GetMinimum(1)){ ymin2 = h2_arm0->GetMinimum(1)-0.05*h2_arm0->GetMinimum(1);}
     else{
-      ymin2 = h2_arm1->GetMinimum()-0.05*h2_arm1->GetMinimum();
+      ymin2 = h2_arm1->GetMinimum(1)-0.05*h2_arm1->GetMinimum(1);
     }
 
     if(h2_arm0->GetMaximum()>h2_arm1->GetMaximum()){ ymax2 = h2_arm0->GetMaximum()+0.05*h2_arm0->GetMaximum();}
@@ -136,9 +138,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
       ymax2 = h2_arm1->GetMaximum()+0.05*h2_arm1->GetMaximum();
     }
 
-    if(h3_arm0->GetMinimum()<h3_arm1->GetMinimum()){ ymin3 = h3_arm0->GetMinimum()-0.05*h3_arm0->GetMinimum();}
+    if(h3_arm0->GetMinimum(1)<h3_arm1->GetMinimum(1)){ ymin3 = h3_arm0->GetMinimum(1)-0.05*h3_arm0->GetMinimum(1);}
     else{
-      ymin3 = h3_arm1->GetMinimum()-0.05*h3_arm1->GetMinimum();
+      ymin3 = h3_arm1->GetMinimum(1)-0.05*h3_arm1->GetMinimum(1);
     }
 
     if(h3_arm0->GetMaximum()>h3_arm1->GetMaximum()){ ymax3 = h3_arm0->GetMaximum()+0.05*h3_arm0->GetMaximum();}
@@ -174,7 +176,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     }
 
     if(h3_arm0->GetXaxis()->GetBinCenter(h3_arm0->FindLastBinAbove(0))>h3_arm1->GetXaxis()->GetBinCenter(h3_arm0->FindLastBinAbove(0))){
-      xmax = h3_arm0->GetXaxis()->GetBinCenter(h3_arm0->FindLastBinAbove(0));
+      xmax3 = h3_arm0->GetXaxis()->GetBinCenter(h3_arm0->FindLastBinAbove(0));
       h_max_value->SetBinContent(7,xmax3+h3_arm0->GetBinWidth(0)/2.);
     }
     else{
@@ -207,7 +209,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     h0_arm1->GetYaxis()->SetRangeUser(ymin0,ymax0);
     h0_arm1->GetXaxis()->SetRangeUser(xmin0,xmax0);
     h0_arm1->SetMarkerSize(.7);
-    h0_arm1->SetMarkerColor(kOrange);
+    h0_arm1->SetMarkerColor(kViolet-6);
     leg->AddEntry(h0_arm1,"Arm 1","p");
 
     h1_arm0->SetMarkerStyle(20);
@@ -224,7 +226,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     h1_arm1->GetYaxis()->SetRangeUser(ymin1,ymax1);
     h1_arm1->GetXaxis()->SetRangeUser(xmin1,xmax1);
     h1_arm1->SetMarkerSize(.7);
-    h1_arm1->SetMarkerColor(kOrange);
+    h1_arm1->SetMarkerColor(kViolet-6);
 
     h2_arm0->SetMarkerStyle(20);
     h2_arm0->GetYaxis()->SetTitleOffset(1.2);
@@ -240,7 +242,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     h2_arm1->GetYaxis()->SetRangeUser(ymin2,ymax2);
     h2_arm1->GetXaxis()->SetRangeUser(xmin2,xmax2);
     h2_arm1->SetMarkerSize(.7);
-    h2_arm1->SetMarkerColor(kOrange);
+    h2_arm1->SetMarkerColor(kViolet-6);
 
     h3_arm0->SetMarkerStyle(20);
     h3_arm0->GetYaxis()->SetTitleOffset(1.2);
@@ -256,7 +258,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
     h3_arm1->GetYaxis()->SetRangeUser(ymin3,ymax3);
     h3_arm1->GetXaxis()->SetRangeUser(xmin3,xmax3);
     h3_arm1->SetMarkerSize(.7);
-    h3_arm1->SetMarkerColor(kOrange);
+    h3_arm1->SetMarkerColor(kViolet-6);
 
     //compute the pad range with suitable margins
     Double_t ymin = -1;
@@ -330,8 +332,8 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
 
     canvas_per_arm->Update();
 
-    std::string pngname = Form("meanGetLeadingVsLuminosity_PerPlanesBothArmsCh%iVertexCMS.png", ch_id);
-    canvas_per_arm->SaveAs(pngname.c_str());
+    std::string picturename = Form("Stability_meanGetLeadingVsLuminosity_PerPlanesBothArmsCh%iVertexCMS.%s", ch_id, pic_format.c_str());
+    canvas_per_arm->SaveAs(picturename.c_str());
 
     delete h_max_value;
     delete canvas_per_arm;
@@ -339,6 +341,6 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::TString filename){
 
   }
 
-  exit();
+  gSystem->Exit(kTRUE);
 
 }
