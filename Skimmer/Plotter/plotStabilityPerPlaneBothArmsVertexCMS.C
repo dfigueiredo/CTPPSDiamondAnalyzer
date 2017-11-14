@@ -8,6 +8,7 @@
 void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
 
   gStyle->SetOptStat(0);
+  gStyle->SetLegendBorderSize(0);
 
   TFile *f = new TFile(filename.c_str());
   TIter next(f->GetListOfKeys());
@@ -17,7 +18,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
   Double_t h = 800;
 
   int bin = 20;
-  std::string pic_format="png";
+  std::string pic_format="pdf";
 
   double xmin0, xmin1, xmin2, xmin3;
   double xmax0, xmax1, xmax2, xmax3;
@@ -59,6 +60,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     pad2_h3->SetFillStyle(4000);
 
     TLegend* leg = new TLegend(0.75,0.75,0.88,0.865);
+    leg->SetFillStyle(0);
 
     std::string histoname_arm0_pl0 = Form("meanGetLeadingVslumisectionArm0Pl0Ch%i", ch_id);
     std::string histoname_arm0_pl1 = Form("meanGetLeadingVslumisectionArm0Pl1Ch%i", ch_id);
@@ -196,69 +198,69 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
 
     h0_arm0->SetMarkerStyle(20);
     h0_arm0->GetYaxis()->SetTitleOffset(1.2);
-    h0_arm0->GetYaxis()->SetTitle("Mean [ns]");
+    h0_arm0->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h0_arm0->GetYaxis()->SetRangeUser(ymin0,ymax0);
     h0_arm0->GetXaxis()->SetRangeUser(xmin0,xmax0);
     h0_arm0->SetMarkerSize(.7);
     h0_arm0->SetMarkerColor(kBlue);
     leg->AddEntry(h0_arm0,"Arm 0","p");
 
-    h0_arm1->SetMarkerStyle(23);
+    h0_arm1->SetMarkerStyle(20);
     h0_arm1->GetYaxis()->SetTitleOffset(1.2);
-    h0_arm1->GetYaxis()->SetTitle("Mean [ns]");
+    h0_arm1->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h0_arm1->GetYaxis()->SetRangeUser(ymin0,ymax0);
     h0_arm1->GetXaxis()->SetRangeUser(xmin0,xmax0);
     h0_arm1->SetMarkerSize(.7);
-    h0_arm1->SetMarkerColor(kViolet-6);
+    h0_arm1->SetMarkerColor(kGreen-6);
     leg->AddEntry(h0_arm1,"Arm 1","p");
 
     h1_arm0->SetMarkerStyle(20);
     h1_arm0->GetYaxis()->SetTitleOffset(1.2);
-    h1_arm0->GetYaxis()->SetTitle("Mean [ns]");
+    h1_arm0->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h1_arm0->GetYaxis()->SetRangeUser(ymin1,ymax1);
     h1_arm0->GetXaxis()->SetRangeUser(xmin1,xmax1);
     h1_arm0->SetMarkerSize(.7);
     h1_arm0->SetMarkerColor(kBlue);
 
-    h1_arm1->SetMarkerStyle(23);
+    h1_arm1->SetMarkerStyle(20);
     h1_arm1->GetYaxis()->SetTitleOffset(1.2);
-    h1_arm1->GetYaxis()->SetTitle("Mean [ns]");
+    h1_arm1->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h1_arm1->GetYaxis()->SetRangeUser(ymin1,ymax1);
     h1_arm1->GetXaxis()->SetRangeUser(xmin1,xmax1);
     h1_arm1->SetMarkerSize(.7);
-    h1_arm1->SetMarkerColor(kViolet-6);
+    h1_arm1->SetMarkerColor(kGreen-6);
 
     h2_arm0->SetMarkerStyle(20);
     h2_arm0->GetYaxis()->SetTitleOffset(1.2);
-    h2_arm0->GetYaxis()->SetTitle("Mean [ns]");
+    h2_arm0->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h2_arm0->GetYaxis()->SetRangeUser(ymin2,ymax2);
     h2_arm0->GetXaxis()->SetRangeUser(xmin2,xmax2);
     h2_arm0->SetMarkerSize(.7);
     h2_arm0->SetMarkerColor(kBlue);
 
-    h2_arm1->SetMarkerStyle(23);
+    h2_arm1->SetMarkerStyle(20);
     h2_arm1->GetYaxis()->SetTitleOffset(1.2);
-    h2_arm1->GetYaxis()->SetTitle("Mean [ns]");
+    h2_arm1->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h2_arm1->GetYaxis()->SetRangeUser(ymin2,ymax2);
     h2_arm1->GetXaxis()->SetRangeUser(xmin2,xmax2);
     h2_arm1->SetMarkerSize(.7);
-    h2_arm1->SetMarkerColor(kViolet-6);
+    h2_arm1->SetMarkerColor(kGreen-6);
 
     h3_arm0->SetMarkerStyle(20);
     h3_arm0->GetYaxis()->SetTitleOffset(1.2);
-    h3_arm0->GetYaxis()->SetTitle("Mean [ns]");
+    h3_arm0->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h3_arm0->GetYaxis()->SetRangeUser(ymin3,ymax3);
     h3_arm0->GetXaxis()->SetRangeUser(xmin3,xmax3);
     h3_arm0->SetMarkerSize(.7);
     h3_arm0->SetMarkerColor(kBlue);
 
-    h3_arm1->SetMarkerStyle(23);
+    h3_arm1->SetMarkerStyle(20);
     h3_arm1->GetYaxis()->SetTitleOffset(1.2);
-    h3_arm1->GetYaxis()->SetTitle("Mean [ns]");
+    h3_arm1->GetYaxis()->SetTitle("Mean Leading Edge [ns]");
     h3_arm1->GetYaxis()->SetRangeUser(ymin3,ymax3);
     h3_arm1->GetXaxis()->SetRangeUser(xmin3,xmax3);
     h3_arm1->SetMarkerSize(.7);
-    h3_arm1->SetMarkerColor(kViolet-6);
+    h3_arm1->SetMarkerColor(kGreen-6);
 
     //compute the pad range with suitable margins
     Double_t ymin = -1;
@@ -268,6 +270,32 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     Double_t xmax = h_max_value->GetMaximum();
     Double_t dx = (xmax-xmin)/0.8; //10 per cent margins left and right
     TGaxis *axis = new TGaxis(xmax,ymin,xmax,ymax,ymin,ymax,510,"+L");
+
+    // Compute Pearson Coeff. Factor
+    TH2F* correlation_pl0_arm0 = new TH2F("correlation_pl0_arm0",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm0->GetNbinsX(), xmin0, xmax0);
+    TH2F* correlation_pl1_arm0 = new TH2F("correlation_pl1_arm0",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm0->GetNbinsX(), xmin1, xmax1);
+    TH2F* correlation_pl2_arm0 = new TH2F("correlation_pl2_arm0",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm0->GetNbinsX(), xmin2, xmax2);
+    TH2F* correlation_pl3_arm0 = new TH2F("correlation_pl3_arm0",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm0->GetNbinsX(), xmin3, xmax3);
+
+    TH2F* correlation_pl0_arm1 = new TH2F("correlation_pl0_arm1",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm1->GetNbinsX(), xmin0, xmax0);
+    TH2F* correlation_pl1_arm1 = new TH2F("correlation_pl1_arm1",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm1->GetNbinsX(), xmin1, xmax1);
+    TH2F* correlation_pl2_arm1 = new TH2F("correlation_pl2_arm1",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm1->GetNbinsX(), xmin2, xmax2);
+    TH2F* correlation_pl3_arm1 = new TH2F("correlation_pl3_arm1",";Vertex Mean Z [cm]; Leading Edge Arm0 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm1->GetNbinsX(), xmin3, xmax3);
+
+    for(int i=1;i<=h_vertexz->GetNbinsX();i++){
+      correlation_pl0_arm0->Fill(h_vertexz->GetBinContent(i), h0_arm0->GetBinContent(i));
+      correlation_pl1_arm0->Fill(h_vertexz->GetBinContent(i), h1_arm0->GetBinContent(i));
+      correlation_pl2_arm0->Fill(h_vertexz->GetBinContent(i), h2_arm0->GetBinContent(i));
+      correlation_pl3_arm0->Fill(h_vertexz->GetBinContent(i), h3_arm0->GetBinContent(i));
+
+      correlation_pl0_arm1->Fill(h_vertexz->GetBinContent(i), h0_arm1->GetBinContent(i));
+      correlation_pl1_arm1->Fill(h_vertexz->GetBinContent(i), h1_arm1->GetBinContent(i));
+      correlation_pl2_arm1->Fill(h_vertexz->GetBinContent(i), h2_arm1->GetBinContent(i));
+      correlation_pl3_arm1->Fill(h_vertexz->GetBinContent(i), h3_arm1->GetBinContent(i));
+    }
+
+    TText *text=new TText(500.,-0.5,"");
+    char result_corr[300];
 
     // Canvas 1
     canvas_per_arm->cd(1);
@@ -281,8 +309,13 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     pad2_h0->cd();
     h_vertexz->Draw("E1 X0 P SAME");
     axis->SetLabelColor(kRed);
-    axis->SetTitle("CMS Vertex, mean Z [cm]");
+    axis->SetTitleOffset(1.3);
+    axis->SetTitle("Mean CMS transverse vertex position [cm]");
     axis->Draw();
+    sprintf(result_corr,"Pearson Coeff. arm0: %.3f",correlation_pl0_arm0->GetCorrelationFactor());
+    text->DrawText(300.,-0.5,result_corr);
+    sprintf(result_corr,"Pearson Coeff. arm1: %.3f",correlation_pl0_arm1->GetCorrelationFactor());
+    text->DrawText(300.,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 2
@@ -298,6 +331,10 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     h_vertexz->Draw("E1 X0 P SAME");
     axis->SetLabelColor(kRed);
     axis->Draw();
+    sprintf(result_corr,"Pearson Coeff. arm0: %.3f",correlation_pl1_arm0->GetCorrelationFactor());
+    text->DrawText(300.,-0.5,result_corr);
+    sprintf(result_corr,"Pearson Coeff. arm1: %.3f",correlation_pl1_arm1->GetCorrelationFactor());
+    text->DrawText(300.,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 3
@@ -313,6 +350,10 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     h_vertexz->Draw("E1 X0 P SAME");
     axis->SetLabelColor(kRed);
     axis->Draw();
+    sprintf(result_corr,"Pearson Coeff. arm0: %.3f",correlation_pl2_arm0->GetCorrelationFactor());
+    text->DrawText(300.,-0.5,result_corr);
+    sprintf(result_corr,"Pearson Coeff. arm1: %.3f",correlation_pl2_arm1->GetCorrelationFactor());
+    text->DrawText(300.,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 4
@@ -328,12 +369,26 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     h_vertexz->Draw("E1 X0 P SAME");
     axis->SetLabelColor(kRed);
     axis->Draw();
+    sprintf(result_corr,"Pearson Coeff. arm0: %.3f",correlation_pl3_arm0->GetCorrelationFactor());
+    text->DrawText(300.,-0.5,result_corr);
+    sprintf(result_corr,"Pearson Coeff. arm1: %.3f",correlation_pl3_arm1->GetCorrelationFactor());
+    text->DrawText(300.,-0.8,result_corr);
     leg->Draw();
 
     canvas_per_arm->Update();
 
     std::string picturename = Form("Stability_meanGetLeadingVsLuminosity_PerPlanesBothArmsCh%iVertexCMS.%s", ch_id, pic_format.c_str());
     canvas_per_arm->SaveAs(picturename.c_str());
+
+    delete correlation_pl0_arm0;
+    delete correlation_pl1_arm0;
+    delete correlation_pl2_arm0;
+    delete correlation_pl3_arm0;
+
+    delete correlation_pl0_arm1;
+    delete correlation_pl1_arm1;
+    delete correlation_pl2_arm1;
+    delete correlation_pl3_arm1;
 
     delete h_max_value;
     delete canvas_per_arm;
