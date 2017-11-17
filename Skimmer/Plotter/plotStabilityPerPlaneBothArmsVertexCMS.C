@@ -16,7 +16,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
   Double_t w = 1000;
   Double_t h = 800;
 
-  int bin = 20;
+  int bin = 10;
   std::string pic_format="pdf";
 
   double xmin0, xmin1, xmin2, xmin3;
@@ -31,7 +31,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     std::string histoname_vertexz = "meanVertexz";
     TH1D* h_vertexz = 0;
     TH1D* h_max_value = new TH1D("max","max", 100, 0, 100);
-    TH1D* h_error = new TH1D("statistics","statistics", 200, 0., 0.1);
+    TH1D* h_error = new TH1D("statistics","statistics", 100, 0., 0.5);
     f->GetObject(histoname_vertexz.c_str(), h_vertexz);
 
     if(do_rebin){
@@ -333,9 +333,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     axis->SetTitle("Mean CMS transverse vertex position [cm]");
     axis->Draw();
     sprintf(result_corr,"Pearson Coeff. 4-5: %.3f",correlation_pl0_arm0->GetCorrelationFactor());
-    text->DrawText(300.,-0.5,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.5,result_corr);
     sprintf(result_corr,"Pearson Coeff. 5-6: %.3f",correlation_pl0_arm1->GetCorrelationFactor());
-    text->DrawText(300.,-0.8,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 2
@@ -352,9 +352,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     axis->SetLabelColor(kRed);
     axis->Draw();
     sprintf(result_corr,"Pearson Coeff. 4-5: %.3f",correlation_pl1_arm0->GetCorrelationFactor());
-    text->DrawText(300.,-0.5,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.5,result_corr);
     sprintf(result_corr,"Pearson Coeff. 5-6: %.3f",correlation_pl1_arm1->GetCorrelationFactor());
-    text->DrawText(300.,-0.8,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 3
@@ -371,9 +371,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     axis->SetLabelColor(kRed);
     axis->Draw();
     sprintf(result_corr,"Pearson Coeff. 4-5: %.3f",correlation_pl2_arm0->GetCorrelationFactor());
-    text->DrawText(300.,-0.5,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.5,result_corr);
     sprintf(result_corr,"Pearson Coeff. 5-6: %.3f",correlation_pl2_arm1->GetCorrelationFactor());
-    text->DrawText(300.,-0.8,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.8,result_corr);
     leg->Draw();
 
     // Canvas 4
@@ -391,9 +391,9 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     axis->SetLabelColor(kRed);
     axis->Draw();
     sprintf(result_corr,"Pearson Coeff. 4-5: %.3f",correlation_pl3_arm0->GetCorrelationFactor());
-    text->DrawText(300.,-0.5,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.5,result_corr);
     sprintf(result_corr,"Pearson Coeff. 5-6: %.3f",correlation_pl3_arm1->GetCorrelationFactor());
-    text->DrawText(300.,-0.8,result_corr);
+    text->DrawText(xmax-0.7*xmax,-0.8,result_corr);
     leg->Draw();
 
     canvas_per_arm->Update();
