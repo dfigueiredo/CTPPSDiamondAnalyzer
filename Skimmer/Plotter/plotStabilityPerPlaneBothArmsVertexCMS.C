@@ -282,15 +282,15 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     TGaxis *axis = new TGaxis(xmax,ymin,xmax,ymax,ymin,ymax,510,"+L");
 
     // Compute Pearson Coeff. Factor
-    TH2F* correlation_pl0_arm0 = new TH2F("correlation_pl0_arm0",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm0->GetNbinsX(), xmin0, xmax0);
-    TH2F* correlation_pl1_arm0 = new TH2F("correlation_pl1_arm0",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm0->GetNbinsX(), xmin1, xmax1);
-    TH2F* correlation_pl2_arm0 = new TH2F("correlation_pl2_arm0",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm0->GetNbinsX(), xmin2, xmax2);
-    TH2F* correlation_pl3_arm0 = new TH2F("correlation_pl3_arm0",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm0->GetNbinsX(), xmin3, xmax3);
+    TH2F* correlation_pl0_arm0 = new TH2F("correlation_pl0_arm0",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm0->GetNbinsX(), xmin0, xmax0);
+    TH2F* correlation_pl1_arm0 = new TH2F("correlation_pl1_arm0",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm0->GetNbinsX(), xmin1, xmax1);
+    TH2F* correlation_pl2_arm0 = new TH2F("correlation_pl2_arm0",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm0->GetNbinsX(), xmin2, xmax2);
+    TH2F* correlation_pl3_arm0 = new TH2F("correlation_pl3_arm0",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 4-5 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm0->GetNbinsX(), xmin3, xmax3);
 
-    TH2F* correlation_pl0_arm1 = new TH2F("correlation_pl0_arm1",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm1->GetNbinsX(), xmin0, xmax0);
-    TH2F* correlation_pl1_arm1 = new TH2F("correlation_pl1_arm1",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm1->GetNbinsX(), xmin1, xmax1);
-    TH2F* correlation_pl2_arm1 = new TH2F("correlation_pl2_arm1",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm1->GetNbinsX(), xmin2, xmax2);
-    TH2F* correlation_pl3_arm1 = new TH2F("correlation_pl3_arm1",";Mean CMS transverse vertex position [cm]; Leading Edge, Sector 5-6[ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm1->GetNbinsX(), xmin3, xmax3);
+    TH2F* correlation_pl0_arm1 = new TH2F("correlation_pl0_arm1",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h0_arm1->GetNbinsX(), xmin0, xmax0);
+    TH2F* correlation_pl1_arm1 = new TH2F("correlation_pl1_arm1",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h1_arm1->GetNbinsX(), xmin1, xmax1);
+    TH2F* correlation_pl2_arm1 = new TH2F("correlation_pl2_arm1",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 5-6 [ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h2_arm1->GetNbinsX(), xmin2, xmax2);
+    TH2F* correlation_pl3_arm1 = new TH2F("correlation_pl3_arm1",";Mean CMS longitudinal vertex position [cm]; Leading Edge, Sector 5-6[ns]", h_vertexz->GetNbinsX(), xmin_vertex, xmax_vertex, h3_arm1->GetNbinsX(), xmin3, xmax3);
 
     for(int i=1;i<=h_vertexz->GetNbinsX();i++){
       correlation_pl0_arm0->Fill(h_vertexz->GetBinContent(i), h0_arm0->GetBinContent(i));
@@ -330,7 +330,7 @@ void plotStabilityPerPlaneBothArmsVertexCMS(std::string filename){
     h_vertexz->Draw("E1 X0 P SAME");
     axis->SetLabelColor(kRed);
     axis->SetTitleOffset(1.3);
-    axis->SetTitle("Mean CMS transverse vertex position [cm]");
+    axis->SetTitle("Mean CMS longitudinal vertex position [cm]");
     axis->Draw();
     sprintf(result_corr,"Pearson Coeff. 4-5: %.3f",correlation_pl0_arm0->GetCorrelationFactor());
     text->DrawText(xmax-0.7*xmax,-0.5,result_corr);
